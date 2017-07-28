@@ -21,6 +21,6 @@ export default {
   margin-right: auto;
   padding-left: 20px;
   padding-right: 20px;
-  max-width: 700px;
+  max-width: 300px;
 }
 </style>
