@@ -33,11 +33,15 @@
       updateData () {
         var now = new Date()
         this.players.forEach((v, i) => {
-          v.secondsOn = this.difTime(v.start, now)
+          let total = 0
+          if (v.isOn) {
+            total += this.secDif(v.start, now)
+          }
+          total += v.totalSecondsOn
+          v.secondsOn = this.formatTime(total)
         })
       },
-      difTime (start, end) {
-        let dif = Math.floor((end.getTime() - start.getTime()) / 1000)
+      formatTime (dif) {
         let min = Math.floor(dif / 60)
         let sec = dif - min * 60
         return min + ':' + this.padLeft(sec, '0', 2)
@@ -45,8 +49,18 @@
       padLeft (string, pad, length) {
         return (new Array(length + 1).join(pad) + string).slice(-length)
       },
+      secDif (start, end) {
+        return Math.floor((end - start) / 1000)
+      },
       clickPlayer (player) {
-        player.isOn = !player.isOn
+        if (player.isOn) {
+          player.totalSecondsOn += this.secDif(player.start, new Date())
+          player.start = 0
+          player.isOn = false
+        } else {
+          player.start = new Date()
+          player.isOn = true
+        }
       }
     },
     beforeCreate () {
@@ -65,8 +79,9 @@
         this.players.push({
           state: 'off',
           name: name,
-          start: new Date(),
+          start: 0,
           secondsOn: 0,
+          totalSecondsOn: 0,
           isOn: false
         })
       })
