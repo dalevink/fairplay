@@ -11,6 +11,7 @@
                 v-bind:class="{ 'player-on': player.isOn  }"
                 @click="clickPlayer(player)"
             >
+
                 <strong class="player-name">{{ player.name }}</strong>
                 <span class="player-seconds">{{ player.secondsOn }}</span>
             </li>
@@ -105,6 +106,8 @@
     .player {
         padding: 20px;
         border: 1px solid white;
+        border-radius: 4px;
+        cursor: pointer;
         background: whitesmoke;
     }
     .player-name {
@@ -119,6 +122,7 @@
         float: right;
     }
     .player-on {
+        border-radius: 2px;
         background: #40a2d9;
         font-weight: 500;
         color: white;
