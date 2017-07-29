@@ -20,6 +20,7 @@
 </template>
 
 <script>
+  import naturalsort from 'naturalsort'
   export default {
     name: 'game',
     data () {
@@ -67,7 +68,7 @@
     beforeCreate () {
     },
     created () {
-      [
+      let players = [
         'Luca',
         'Liam',
         'Jai',
@@ -76,7 +77,9 @@
         'Ben',
         'William',
         'Jackson'
-      ].forEach((name) => {
+      ]
+      players.sort(naturalsort)
+      players.forEach((name) => {
         this.players.push({
           state: 'off',
           name: name,

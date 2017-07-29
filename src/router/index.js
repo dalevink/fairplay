@@ -15,8 +15,14 @@ export default new Router({
     },
     {
       path: '/add-team',
+      component: Team,
+      props: { visibility: 'active' }
+    },
+    {
+      path: '/add-team/archived',
       name: 'Add Team',
-      component: Team
+      component: Team,
+      props: { visibility: 'archived' }
     },
     {
       path: '/view-game',
