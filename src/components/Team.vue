@@ -26,6 +26,7 @@
             <input class="new-todo"
                    autofocus autocomplete="off"
                    placeholder="Add a New Player"
+                   @blur="addTodo"
                    v-model="newTodo"
                    @keyup.enter="addTodo">
 
@@ -52,7 +53,7 @@
 // and hash-based routing in ~120 effective lines of JavaScript.
 
 // localStorage persistence
-var STORAGE_KEY = 'teamV1'
+var STORAGE_KEY = 'teamV2'
 var todoStorage = {
   fetch: function () {
     var todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
@@ -84,6 +85,7 @@ var filters = {
   }
 }
 
+import naturalsort from 'naturalsort'
 export default {
   // app initial state
   props: [ 'visibility' ],
@@ -116,13 +118,13 @@ export default {
       return filters[this.visibility](this.todos)
     },
     playerCount: function () {
-      return this.todos.length
+      return this.filteredTodos.length
     }
   },
 
   filters: {
     pluralize: function (n) {
-      return n === 1 ? 'item' : 'items'
+      return n === 1 ? 'player' : 'players'
     }
   },
 
@@ -138,6 +140,9 @@ export default {
         id: todoStorage.uid++,
         title: value,
         archived: false
+      })
+      this.todos = this.todos.sort(function (a, b) {
+        return [ a.title, b.title ].sort(naturalsort)[0] === a.title ? -1 : 1
       })
       this.newTodo = ''
     },
