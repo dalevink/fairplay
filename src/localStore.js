@@ -1,12 +1,12 @@
 // localStorage persistence
-var STORAGE_KEY = 'teamV026'
+var STORAGE_KEY = 'teamV029'
 export default {
   fetch: function () {
     var t = JSON.parse(localStorage.getItem(STORAGE_KEY))
     return t || {
       players: [],
-      newTodo: '',
-      editedTodo: false,
+      newPlayer: '',
+      editingName: false,
       uid: 0
     }
   },

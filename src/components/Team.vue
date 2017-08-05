@@ -7,27 +7,27 @@
     <h1>Manage Players</h1>
 
       <ul class="players-ul">
-        <li v-for="todo in filteredTodos"
+        <li v-for="player in filteredPlayers"
             class="players-li"
-            :key="todo.id"
-            :class="{ archived: todo.archived, 'player-editing': todo == editedTodo }">
+            :key="player.id"
+            :class="{ archived: player.archived, 'player-editing': player == editingName }">
           <div class="player-title">
-            <label @click="editTodo(todo)">{{ todo.title }}</label>
+            <label @click="editPlayer(player)">{{ player.title }}</label>
           </div>
           <input class="player-edit" type="text"
-                 v-model="todo.title"
-                 v-todo-focus="todo == editedTodo"
-                 @blur="doneEdit(todo)"
-                 @keyup.enter="doneEdit(todo)"
-                 @keyup.esc="cancelEdit(todo)">
+                 v-model="player.title"
+                 v-player-focus="player == editingName"
+                 @blur="doneEdit(player)"
+                 @keyup.enter="doneEdit(player)"
+                 @keyup.esc="cancelEdit(player)">
         </li>
         <li v-show="visibility == 'active'">
-          <input class="new-todo"
+          <input class="new-player"
                  autofocus autocomplete="off"
                  placeholder="Add a New Player"
-                 @blur="addTodo"
-                 v-model="newTodo"
-                 @keyup.enter="addTodo">
+                 @blur="addPlayer"
+                 v-model="newPlayer"
+                 @keyup.enter="addPlayer">
         </li>
       </ul>
       <footer class="footer">
@@ -35,7 +35,7 @@
       </footer>
       <section>
           <h3 v-show="visibility != 'active'"><a href="#/edit-players" :class="{ selected: visibility == 'active' }">&larr; Active Players</a></h3>
-          <h3 v-show="visibility == 'active' && archivedTodos.length"><a href="#/edit-players/archived" :class="{ selected: visibility == 'archived' }">View Deleted Players</a></h3>
+          <h3 v-show="visibility == 'active' && archivedPlayers.length"><a href="#/edit-players/archived" :class="{ selected: visibility == 'archived' }">View Deleted Players</a></h3>
       </section>
 
   </div>
@@ -49,13 +49,13 @@ var filters = {
     return players
   },
   active: function (players) {
-    return players.filter(function (todo) {
-      return !todo.archived
+    return players.filter(function (player) {
+      return !player.archived
     })
   },
   archived: function (players) {
-    return players.filter(function (todo) {
-      return todo.archived
+    return players.filter(function (player) {
+      return player.archived
     })
   }
 }
@@ -85,14 +85,14 @@ export default {
   // computed properties
   // http://vuejs.org/guide/computed.html
   computed: {
-    filteredTodos: function () {
+    filteredPlayers: function () {
       return filters[this.visibility](this.players)
     },
-    archivedTodos: function () {
+    archivedPlayers: function () {
       return filters['archived'](this.players)
     },
     playerCount: function () {
-      return this.filteredTodos.length
+      return this.filteredPlayers.length
     }
   },
 
@@ -105,8 +105,8 @@ export default {
   // methods that implement data logic.
   // note there's no DOM manipulation here at all.
   methods: {
-    addTodo: function () {
-      var value = this.newTodo && this.newTodo.trim()
+    addPlayer: function () {
+      var value = this.newPlayer && this.newPlayer.trim()
       if (!value) {
         return
       }
@@ -118,33 +118,33 @@ export default {
       this.players = this.players.sort(function (a, b) {
         return [ a.title, b.title ].sort(naturalSort)[0] === a.title ? -1 : 1
       })
-      this.newTodo = ''
+      this.newPlayer = ''
     },
 
-    editTodo: function (todo) {
-      this.beforeEditCache = todo.title
-      this.editedTodo = todo
+    editPlayer: function (player) {
+      this.beforeEditCache = player.title
+      this.editingName = player
     },
 
-    doneEdit: function (todo) {
-      if (!this.editedTodo) {
+    doneEdit: function (player) {
+      if (!this.editingName) {
         return
       }
-      this.editedTodo = false
-      todo.title = todo.title.trim()
-      if (todo.title === '') {
-        if (todo.archived) {
-          this.players.splice(this.players.indexOf(todo), 1)
+      this.editingName = false
+      player.title = player.title.trim()
+      if (player.title === '') {
+        if (player.archived) {
+          this.players.splice(this.players.indexOf(player), 1)
         } else {
-          todo.title = this.beforeEditCache
-          todo.archived = true
+          player.title = this.beforeEditCache
+          player.archived = true
         }
       }
     },
 
-    cancelEdit: function (todo) {
-      this.editedTodo = false
-      todo.title = this.beforeEditCache
+    cancelEdit: function (player) {
+      this.editingName = false
+      player.title = this.beforeEditCache
     }
 
   },
@@ -153,7 +153,7 @@ export default {
   // before focusing on the input field.
   // http://vuejs.org/guide/custom-directive.html
   directives: {
-    'todo-focus': function (el, binding) {
+    'player-focus': function (el, binding) {
       if (binding.value) {
         el.focus()
       }
@@ -194,7 +194,7 @@ section {
 .footer {
     text-align: right;
 }
-.new-todo {
+.new-player {
   padding: 20px;
   border: 1px solid #ccc;
   display: inline-block;
