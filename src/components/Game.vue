@@ -20,7 +20,7 @@
 </template>
 
 <script>
-  import naturalsort from 'naturalsort'
+  import naturalSort from 'javascript-natural-sort'
   export default {
     name: 'game',
     data () {
@@ -76,7 +76,7 @@
         'William',
         'Jackson'
       ]
-      players.sort(naturalsort)
+      players.sort(naturalSort)
       players.forEach((name) => {
         this.players.push({
           state: 'off',
@@ -103,7 +103,7 @@
         padding: 0;
     }
     .player {
-        padding: 20px;
+        padding: 17px 20px;
         border: 1px solid white;
         border-radius: 4px;
         cursor: pointer;

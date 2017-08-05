@@ -60,7 +60,7 @@ var filters = {
   }
 }
 
-import naturalsort from 'naturalsort'
+import naturalSort from 'javascript-natural-sort'
 import localStore from '../localStore'
 export default {
   // app initial state
@@ -116,7 +116,7 @@ export default {
         archived: false
       })
       this.players = this.players.sort(function (a, b) {
-        return [ a.title, b.title ].sort(naturalsort)[0] === a.title ? -1 : 1
+        return [ a.title, b.title ].sort(naturalSort)[0] === a.title ? -1 : 1
       })
       this.newTodo = ''
     },
