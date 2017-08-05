@@ -1,10 +1,10 @@
 <template>
     <div class="game">
-        <ul>
-            <li>
-                <router-link to="/add-team">Add Team</router-link>
-            </li>
-        </ul>
+
+        <h3 class="crumb"><router-link to="/">&larr; Done</router-link></h3>
+        <div class="clear"></div>
+
+        <h1>Game</h1>
         <ul class="players">
             <li class="player"
                 v-for="player in players"
@@ -65,8 +65,6 @@
         }
       }
     },
-    beforeCreate () {
-    },
     created () {
       let players = [
         'Luca',
@@ -89,6 +87,7 @@
           isOn: false
         })
       })
+      this.updateData()
     },
     mounted () {
       window.setInterval(this.updateData, 100)
@@ -98,9 +97,6 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-    h1, h2 {
-        font-weight: normal;
-    }
 
     .players {
         list-style-type: none;

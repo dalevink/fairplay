@@ -14,12 +14,12 @@ export default new Router({
       component: Hello
     },
     {
-      path: '/add-team',
+      path: '/edit-players',
       component: Team,
       props: { visibility: 'active' }
     },
     {
-      path: '/add-team/archived',
+      path: '/edit-players/archived',
       name: 'Add Team',
       component: Team,
       props: { visibility: 'archived' }

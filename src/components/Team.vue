@@ -1,7 +1,10 @@
 <template>
   <div class="team">
+
+    <h3 class="crumb"><router-link to="/">&larr; Done Editing</router-link></h3>
+    <div class="clear"></div>
+
     <h1>Manage Players</h1>
-      <h3><router-link to="/view-game">&larr; Done</router-link></h3>
 
       <ul class="players-ul">
         <li v-for="todo in filteredTodos"
@@ -31,8 +34,8 @@
           <strong>{{ playerCount }}</strong> {{ visibility == 'archived' ? 'Deleted' : '' }} {{ playerCount | pluralize }}
       </footer>
       <section>
-          <h3 v-show="visibility != 'active'"><a href="#/add-team" :class="{ selected: visibility == 'active' }">&larr; Active Players</a></h3>
-          <h3 v-show="visibility == 'active' && archivedTodos.length"><a href="#/add-team/archived" :class="{ selected: visibility == 'archived' }">View Deleted Players</a></h3>
+          <h3 v-show="visibility != 'active'"><a href="#/edit-players" :class="{ selected: visibility == 'active' }">&larr; Active Players</a></h3>
+          <h3 v-show="visibility == 'active' && archivedTodos.length"><a href="#/edit-players/archived" :class="{ selected: visibility == 'archived' }">View Deleted Players</a></h3>
       </section>
 
   </div>
@@ -40,62 +43,40 @@
 
 <script>
 
-// Full spec-compliant TodoMVC with localStorage persistence
-// and hash-based routing in ~120 effective lines of JavaScript.
-
-// localStorage persistence
-var STORAGE_KEY = 'teamV001'
-var todoStorage = {
-  fetch: function () {
-    var todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-    todos.forEach(function (todo, index) {
-      todo.id = index
-    })
-    todoStorage.uid = todos.length
-    return todos
-  },
-  save: function (todos) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
-  }
-}
-
 // visibility filters
 var filters = {
-  all: function (todos) {
-    return todos
+  all: function (players) {
+    return players
   },
-  active: function (todos) {
-    return todos.filter(function (todo) {
+  active: function (players) {
+    return players.filter(function (todo) {
       return !todo.archived
     })
   },
-  archived: function (todos) {
-    return todos.filter(function (todo) {
+  archived: function (players) {
+    return players.filter(function (todo) {
       return todo.archived
     })
   }
 }
 
 import naturalsort from 'naturalsort'
+import localStore from '../localStore'
 export default {
   // app initial state
   props: [ 'visibility' ],
   data () {
-    return {
-      todos: todoStorage.fetch(),
-      newTodo: '',
-      editedTodo: null
-    }
+    return localStore.fetch()
   },
 
   beforeCreate () {
   },
 
-  // watch todos change for localStorage persistence
+  // watch players change for localStorage persistence
   watch: {
-    todos: {
-      handler: function (todos) {
-        todoStorage.save(todos)
+    players: {
+      handler: function (players) {
+        localStore.save(this._data)
       },
       deep: true
     }
@@ -105,10 +86,10 @@ export default {
   // http://vuejs.org/guide/computed.html
   computed: {
     filteredTodos: function () {
-      return filters[this.visibility](this.todos)
+      return filters[this.visibility](this.players)
     },
     archivedTodos: function () {
-      return filters['archived'](this.todos)
+      return filters['archived'](this.players)
     },
     playerCount: function () {
       return this.filteredTodos.length
@@ -129,12 +110,12 @@ export default {
       if (!value) {
         return
       }
-      this.todos.push({
-        id: todoStorage.uid++,
+      this.players.push({
+        id: this.uid++,
         title: value,
         archived: false
       })
-      this.todos = this.todos.sort(function (a, b) {
+      this.players = this.players.sort(function (a, b) {
         return [ a.title, b.title ].sort(naturalsort)[0] === a.title ? -1 : 1
       })
       this.newTodo = ''
@@ -149,11 +130,11 @@ export default {
       if (!this.editedTodo) {
         return
       }
-      this.editedTodo = null
+      this.editedTodo = false
       todo.title = todo.title.trim()
       if (todo.title === '') {
         if (todo.archived) {
-          this.todos.splice(this.todos.indexOf(todo), 1)
+          this.players.splice(this.players.indexOf(todo), 1)
         } else {
           todo.title = this.beforeEditCache
           todo.archived = true
@@ -162,7 +143,7 @@ export default {
     },
 
     cancelEdit: function (todo) {
-      this.editedTodo = null
+      this.editedTodo = false
       todo.title = this.beforeEditCache
     }
 
