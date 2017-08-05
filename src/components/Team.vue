@@ -29,17 +29,16 @@
                    @blur="addTodo"
                    v-model="newTodo"
                    @keyup.enter="addTodo">
-
           </li>
         </ul>
       </section>
       <footer class="footer">
         <span class="todo-count">
-          <strong>{{ playerCount }}</strong> {{ playerCount | pluralize }}
+          <strong>{{ playerCount }}</strong> {{ visibility == 'archived' ? 'Deleted' : '' }} {{ playerCount | pluralize }}
         </span>
         <ul class="filters">
-          <li><a href="#/add-team" :class="{ selected: visibility == 'active' }">Active</a></li>
-          <li><a href="#/add-team/archived" :class="{ selected: visibility == 'archived' }">Archived</a></li>
+          <li v-show="visibility != 'active'"><a href="#/add-team" :class="{ selected: visibility == 'active' }">&larr; Active Players</a></li>
+          <li v-show="visibility == 'active' && archivedTodos.length"><a href="#/add-team/archived" :class="{ selected: visibility == 'archived' }">See Deleted Players</a></li>
         </ul>
       </footer>
     </section>
@@ -114,8 +113,10 @@ export default {
   // http://vuejs.org/guide/computed.html
   computed: {
     filteredTodos: function () {
-      console.log(this.visibility)
       return filters[this.visibility](this.todos)
+    },
+    archivedTodos: function () {
+      return filters['archived'](this.todos)
     },
     playerCount: function () {
       return this.filteredTodos.length
@@ -124,7 +125,7 @@ export default {
 
   filters: {
     pluralize: function (n) {
-      return n === 1 ? 'player' : 'players'
+      return n === 1 ? 'Player' : 'Players'
     }
   },
 
