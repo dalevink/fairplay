@@ -53,7 +53,7 @@
 // and hash-based routing in ~120 effective lines of JavaScript.
 
 // localStorage persistence
-var STORAGE_KEY = 'teamV2'
+var STORAGE_KEY = 'teamV001'
 var todoStorage = {
   fetch: function () {
     var todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
@@ -158,9 +158,13 @@ export default {
       }
       this.editedTodo = null
       todo.title = todo.title.trim()
-      if (!todo.title) {
-        todo.title = this.beforeEditCache
-        todo.archived = true
+      if (todo.title === '') {
+        if (todo.archived) {
+          this.todos.splice(this.todos.indexOf(todo), 1)
+        } else {
+          todo.title = this.beforeEditCache
+          todo.archived = true
+        }
       }
     },
 
