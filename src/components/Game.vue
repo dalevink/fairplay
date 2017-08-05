@@ -20,14 +20,14 @@
 
         <section v-show="logList.length">
             <h3>Recent Sub{{ logList.length | pluralize }}</h3>
-            <transition-group name="anim-list" tag="ul" class="sub-log">
+            <ul class="sub-log">
                 <li class="log"
                     v-for="log in logList"
                     :key="logList[0]"
                 >
                     <strong class="player-name">{{ log[2].name }} {{ log | what }}</strong>
                 </li>
-            </transition-group>
+            </ul>
         </section>
     </div>
 </template>
