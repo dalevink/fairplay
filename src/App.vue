@@ -67,5 +67,9 @@ h1 {
   width: 0;
   height: 0;
 }
+.anim-list-move {
+  transition: transform .2s;
+}
+
 
 </style>

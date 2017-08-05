@@ -5,17 +5,18 @@
         <div class="clear"></div>
 
         <h1>Game</h1>
-        <ul class="players">
+        <transition-group name="anim-list" tag="ul" class="players">
             <li class="player"
-                v-for="player in players"
-                v-bind:class="{ 'player-on': player.isOn  }"
+                v-for="player in playersFiltered"
+                :key="player.id"
+                :class="{ 'player-on': player.isOn  }"
                 @click="clickPlayer(player)"
             >
 
                 <strong class="player-name">{{ player.name }}</strong>
                 <span class="player-seconds">{{ player.secondsOn }}</span>
             </li>
-        </ul>
+        </transition-group>
     </div>
 </template>
 
@@ -30,6 +31,15 @@
       }
     },
     computed: {
+      playersFiltered () {
+        let off = this.players.filter(function (p) {
+          return p.isOn === false
+        }).sort(naturalSort)
+        let on = this.players.filter(function (p) {
+          return p.isOn !== false
+        }).sort(naturalSort)
+        return off.concat(on)
+      }
     },
     methods: {
       updateData () {
@@ -77,8 +87,9 @@
         'Jackson'
       ]
       players.sort(naturalSort)
-      players.forEach((name) => {
+      players.forEach((name, id) => {
         this.players.push({
+          id: id,
           state: 'off',
           name: name,
           start: 0,

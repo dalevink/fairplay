@@ -6,7 +6,7 @@
 
     <h1>Manage Players</h1>
 
-      <ul class="players-ul">
+      <transition-group name="anim-list" tag="ul" class="players-ul">
         <li v-for="player in filteredPlayers"
             class="players-li"
             :key="player.id"
@@ -21,7 +21,7 @@
                  @keyup.enter="doneEdit(player)"
                  @keyup.esc="cancelEdit(player)">
         </li>
-        <li v-show="visibility == 'active'">
+        <li :key="'active'" v-show="visibility == 'active'">
           <input class="new-player"
                  autofocus autocomplete="off"
                  placeholder="Add a New Player"
@@ -29,7 +29,7 @@
                  v-model="newPlayer"
                  @keyup.enter="addPlayer">
         </li>
-      </ul>
+      </transition-group>
       <footer class="footer">
           <strong>{{ playerCount }}</strong> {{ visibility == 'archived' ? 'Deleted' : '' }} {{ playerCount | pluralize }}
       </footer>
