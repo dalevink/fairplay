@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <h1>FairPlay</h1>
+    <h3 class="app-name">FairPlay</h3>
     <router-view></router-view>
   </div>
 </template>
@@ -18,14 +18,25 @@ html {
   font-size: 16px;
   line-height: 1.5;
 }
+*, :after, :before {
+  box-sizing: inherit;
+}
+a {
+  text-decoration: none;
+}
+
 h1 {
   text-align: center;
+}
+.app-name {
+  text-align: center;
+  color: #999;
 }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  margin-top: 60px;
+  margin-top: 30px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 20px;

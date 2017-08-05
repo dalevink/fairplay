@@ -1,47 +1,39 @@
 <template>
   <div class="team">
     <h1>Manage Players</h1>
-    <ul>
-      <li><router-link to="/view-game">View Game</router-link></li>
-    </ul>
+      <h3><router-link to="/view-game">&larr; Done</router-link></h3>
 
-    <section class="todoapp">
-      <section class="main">
-        <ul class="todo-list">
-          <li v-for="todo in filteredTodos"
-              class="todo"
-              :key="todo.id"
-              :class="{ archived: todo.archived, 'player-editing': todo == editedTodo }">
-            <div class="player-title">
-              <label @click="editTodo(todo)">{{ todo.title }}</label>
-            </div>
-            <input class="player-edit" type="text"
-                   v-model="todo.title"
-                   v-todo-focus="todo == editedTodo"
-                   @blur="doneEdit(todo)"
-                   @keyup.enter="doneEdit(todo)"
-                   @keyup.esc="cancelEdit(todo)">
-          </li>
-          <li v-show="visibility == 'active'">
-            <input class="new-todo"
-                   autofocus autocomplete="off"
-                   placeholder="Add a New Player"
-                   @blur="addTodo"
-                   v-model="newTodo"
-                   @keyup.enter="addTodo">
-          </li>
-        </ul>
-      </section>
+      <ul class="players-ul">
+        <li v-for="todo in filteredTodos"
+            class="players-li"
+            :key="todo.id"
+            :class="{ archived: todo.archived, 'player-editing': todo == editedTodo }">
+          <div class="player-title">
+            <label @click="editTodo(todo)">{{ todo.title }}</label>
+          </div>
+          <input class="player-edit" type="text"
+                 v-model="todo.title"
+                 v-todo-focus="todo == editedTodo"
+                 @blur="doneEdit(todo)"
+                 @keyup.enter="doneEdit(todo)"
+                 @keyup.esc="cancelEdit(todo)">
+        </li>
+        <li v-show="visibility == 'active'">
+          <input class="new-todo"
+                 autofocus autocomplete="off"
+                 placeholder="Add a New Player"
+                 @blur="addTodo"
+                 v-model="newTodo"
+                 @keyup.enter="addTodo">
+        </li>
+      </ul>
       <footer class="footer">
-        <span class="todo-count">
           <strong>{{ playerCount }}</strong> {{ visibility == 'archived' ? 'Deleted' : '' }} {{ playerCount | pluralize }}
-        </span>
-        <ul class="filters">
-          <li v-show="visibility != 'active'"><a href="#/add-team" :class="{ selected: visibility == 'active' }">&larr; Active Players</a></li>
-          <li v-show="visibility == 'active' && archivedTodos.length"><a href="#/add-team/archived" :class="{ selected: visibility == 'archived' }">See Deleted Players</a></li>
-        </ul>
       </footer>
-    </section>
+      <section>
+          <h3 v-show="visibility != 'active'"><a href="#/add-team" :class="{ selected: visibility == 'active' }">&larr; Active Players</a></h3>
+          <h3 v-show="visibility == 'active' && archivedTodos.length"><a href="#/add-team/archived" :class="{ selected: visibility == 'archived' }">View Deleted Players</a></h3>
+      </section>
 
   </div>
 </template>
@@ -192,13 +184,34 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-ul {
+.players-ul {
   width: 100%;
   list-style-type: none;
   padding: 0;
 }
-li {
+.players-li {
   padding: 0;
+}
+.instructions {
+  margin: 0;
+}
+.instructions li {
+  color: #666;
+  margin: 0;
+  padding: 0;
+}
+.instructions:first-child {
+  padding: 0;
+}
+.instructions > li {
+  list-style: none;
+  padding: 0;
+}
+section {
+    margin: 0;
+}
+.footer {
+    text-align: right;
 }
 .new-todo {
   padding: 20px;
