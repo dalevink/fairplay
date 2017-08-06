@@ -6,8 +6,49 @@
         </h3>
         <div class="clear"></div>
 
-        <h1>Game</h1>
+        <div
+                v-show="gameState == 0"
+        >
+            <h1>New Game</h1>
+            <button
+                    class=""
+                    @click="startGame()"
+            >
+                Start Game</button>
+        </div>
 
+        <div
+                v-show="gameState == 1"
+        >
+            <h1>Game On!</h1>
+            <button
+                    @click="pausePlay()"
+            >
+                Stop Play</button>
+        </div>
+
+        <div
+                v-show="gameState == 2"
+        >
+            <h1>Time Stopped</h1>
+            <button
+                    @click="resumePlay()"
+            >
+                Start Play</button>
+            <button
+                    @click="endGame()"
+            >
+                End Game</button>
+        </div>
+
+        <div
+                v-show="gameState == 3"
+        >
+            <h1>End of Game</h1>
+        </div>
+
+        <section>
+        </section>
         <transition-group name="anim-list" tag="ul" class="players">
             <li class="player"
                 v-for="player in playersFiltered"
@@ -51,6 +92,13 @@
     '0': 'Off',
     '1': 'On'
   }
+  const gameStates = {
+    0: 'New Game',
+    1: 'Play Started',
+    2: 'Play Started',
+    3: 'Game Ended'
+  }
+  console.log(gameStates)
   var formatTime = function (secs) {
     let min = Math.floor(secs / 60)
     let sec = secs - min * 60
@@ -61,6 +109,7 @@
     name: 'game',
     data () {
       return {
+        gameState: 0,
         timeSync: 0,
         logId: 0,
         logList: [],
@@ -100,6 +149,20 @@
       }
     },
     methods: {
+      // Start / End Game + Pause / Resume Play
+      startGame () {
+        this.gameState = 1
+      },
+      pausePlay () {
+        this.gameState = 2
+      },
+      resumePlay () {
+        this.gameState = 1
+      },
+      endGame () {
+        this.gameState = 3
+      },
+
       timeSort (a, b) {
         return a.secondsOn < b.secondsOn ? 1 : -1
       },
