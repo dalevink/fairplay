@@ -138,13 +138,8 @@
         return n === 1 ? '' : 's'
       },
       what: function (log) {
-        let howLong = log['dif'] > 10 ? formatTime(log['dif']) : ''
-        let what = ''
-        if (log['totalSeconds'] < 1) {
-          what = 'Starts'
-        } else {
-          what = log['player'] === 0 ? 'On' : 'Off'
-        }
+        let howLong = log['logDif'] > 10 ? formatTime(log['logDif']) : ''
+        let what = log['logIsOn'] === 1 ? 'On' : 'Off'
         return what + ' ' + howLong
       }
     },
@@ -180,7 +175,7 @@
           if (v.isOn === 1) {
             total += this.secDif(v.start, now)
           }
-          total += v.totalSecondsOn
+          total += v.totalOn
           v.secondsOn = total
         })
       },
@@ -190,32 +185,34 @@
       clickPlayer (player) {
         let dif = 0
         let now = timeRounded(this.timeSync)
+
         dif = this.secDif(player.start, now)
-        if (player.isOn === 1) {
-          player.totalSecondsOn += dif
-          player.isOn = 0
-        } else {
-          player.isOn = 1
-        }
         player.start = now
 
-        let last = this.logList.find(log => log.player === player)
-        if (!last || this.cleanLog(this.logList, last, now, 15)) {
-          this.logList.unshift({
-            'id': this.logId++,
-            'time': now,
-            'what': player.isOn,
-            'totalSeconds': player.totalSecondsOn,
-            'player': player,
-            'dif': dif
-          })
+        if (player.isOn === 1) {
+          player.totalOn += dif
+          player.isOn = 0
+        } else {
+          player.totalOff += dif
+          player.isOn = 1
         }
+
+        this.logList.unshift({
+          'id': this.logId++,
+          'player': player,
+          'logTime': now,
+          'logIsOn': player.isOn,
+          'logDif': dif
+        })
       },
       cleanLog (logList, last, now, minSecs) {
+        // todo ::
         // We do not want multiple changes to the same Player logged
         // i.e. user made a mistake and quickly corrected (within 30 seconds)
-        if (last && ((now - last['time']) / 1000) < minSecs) {
-          // ..when found, remove last log of this player and ignore this one
+        // ..when found, remove last log of this player and ignore this one
+        // let last = this.logList.find(log => log.player === player)
+        // if (!last || this.cleanLog(this.logList, last, now, 15)) {
+        if (last && ((now - last['logTime']) / 1000) < minSecs) {
           logList.splice(logList.indexOf(last), 1)
           return false
         } else {
@@ -226,12 +223,8 @@
     created () {
       let players = [
         'Luca',
-        'Liam',
-        'Jai',
         'Zaid',
-        'George',
         'Ben',
-        'William',
         'Jackson'
       ]
       players.sort(naturalSort)
@@ -241,7 +234,8 @@
           name: name,
           start: timeRounded(this.timeSync),
           secondsOn: 0,
-          totalSecondsOn: 0,
+          totalOn: 0,
+          totalOff: 0,
           isOn: -1
         })
       })
