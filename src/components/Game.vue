@@ -87,11 +87,6 @@
     let dif = Math.round((now - syncWith) / 1000) * 1000
     return new Date(syncWith + dif)
   }
-  const states = {
-    '-1': 'On, Starts',
-    '0': 'Off',
-    '1': 'On'
-  }
   const gameStates = {
     0: 'New Game',
     1: 'Play Started',
@@ -145,7 +140,13 @@
       },
       what: function (log) {
         let howLong = log[3] > 10 ? formatTime(log[3]) : ''
-        return states[log[1]] + ' ' + howLong
+        let what = ''
+        if (log[1] < 1) {
+          what = 'Starts'
+        } else {
+          what = log[1] === 0 ? 'On' : 'Off'
+        }
+        return what + ' ' + howLong
       }
     },
     methods: {
@@ -182,8 +183,6 @@
       },
       clickPlayer (player) {
         let dif = 0
-        // Do not dif first sub
-        let firstSub = player.isOn === -1
         let now = dateRounded(this.timeSync)
         dif = this.secDif(player.start, now)
         if (player.isOn === 1) {
@@ -196,12 +195,12 @@
 
         // We do not want multiple changes to the same Player logged
         // i.e. user made a mistake and quickly corrected (within 30 seconds)
-        let lastI = this.getLastLog(player.id, now, 30)
+        let lastI = this.getLastLog(player.id, now, 15)
         if (lastI > -1) {
             // ..when found, remove last log of this player and ignore this one
           this.logList.splice(lastI, 1)
         } else {
-          this.logList.unshift([ this.logId++, firstSub ? -1 : player.isOn, player, dif, now ])
+          this.logList.unshift([ this.logId++, player.totalSecondsOn, player, dif, now ])
         }
       },
       getLastLog (id, now, minSecs) {
