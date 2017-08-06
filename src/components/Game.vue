@@ -66,9 +66,9 @@
             <ul class="sub-log">
                 <li class="log"
                     v-for="log in logList"
-                    :key="logList[0]"
+                    :key="logList['id']"
                 >
-                    <strong class="player-name">{{ log[2].name }} {{ log | what }}</strong>
+                    <strong class="player-name">{{ log['player'].name }} {{ log | what }}</strong>
                 </li>
             </ul>
         </section>
@@ -128,9 +128,6 @@
           return p.isOn === 1
         }).sort(this.timeSort)
         return off.concat(on)
-      },
-      logMax () {
-        return this.logList.splice(6)
       }
     },
     filters: {
@@ -141,12 +138,12 @@
         return n === 1 ? '' : 's'
       },
       what: function (log) {
-        let howLong = log[3] > 10 ? formatTime(log[3]) : ''
+        let howLong = log['dif'] > 10 ? formatTime(log['dif']) : ''
         let what = ''
-        if (log[1] < 1) {
+        if (log['totalSeconds'] < 1) {
           what = 'Starts'
         } else {
-          what = log[1] === 0 ? 'On' : 'Off'
+          what = log['player'] === 0 ? 'On' : 'Off'
         }
         return what + ' ' + howLong
       }
@@ -202,22 +199,27 @@
         }
         player.start = now
 
-        // We do not want multiple changes to the same Player logged
-        // i.e. user made a mistake and quickly corrected (within 30 seconds)
-        let lastI = this.getLastLog(player.id, now, 15)
-        if (lastI > -1) {
-            // ..when found, remove last log of this player and ignore this one
-          this.logList.splice(lastI, 1)
-        } else {
-          this.logList.unshift([ this.logId++, player.totalSecondsOn, player, dif, now ])
+        let last = this.logList.find(log => log.player === player)
+        if (!last || this.cleanLog(this.logList, last, now, 15)) {
+          this.logList.unshift({
+            'id': this.logId++,
+            'time': now,
+            'what': player.isOn,
+            'totalSeconds': player.totalSecondsOn,
+            'player': player,
+            'dif': dif
+          })
         }
       },
-      getLastLog (id, now, minSecs) {
-        let last = this.logList.find(log => log[2].id === id)
-        if (last && ((now.getTime() - last[4].getTime()) / 1000) < minSecs) {
-          return this.logList.indexOf(last)
+      cleanLog (logList, last, now, minSecs) {
+        // We do not want multiple changes to the same Player logged
+        // i.e. user made a mistake and quickly corrected (within 30 seconds)
+        if (last && ((now.getTime() - last['time'].getTime()) / 1000) < minSecs) {
+          // ..when found, remove last log of this player and ignore this one
+          logList.splice(logList.indexOf(last), 1)
+          return false
         } else {
-          return -1
+          return true
         }
       }
     },
