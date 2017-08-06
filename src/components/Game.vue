@@ -81,11 +81,11 @@
   var padLeft = function (string, pad, length) {
     return (new Array(length + 1).join(pad) + string).slice(-length)
   }
-  function dateRounded (syncWith) {
+  function timeRounded (syncWith) {
     let now = new Date().getTime()
     // Get time difference and round to nearest second
     let dif = Math.round((now - syncWith) / 1000) * 1000
-    return new Date(syncWith + dif)
+    return new Date(syncWith + dif).getTime()
   }
   const gameStates = {
     0: 'New Game',
@@ -166,7 +166,7 @@
         this.gameState = 3
       },
       insertGameLog () {
-        this.gameTimeLog.unshift([ this.gameState, dateRounded(this.timeSync) ])
+        this.gameTimeLog.unshift([ this.gameState, timeRounded(this.timeSync) ])
         console.log(this.gameTimeLog)
       },
 
@@ -174,7 +174,7 @@
         return a.secondsOn < b.secondsOn ? 1 : -1
       },
       updateData () {
-        var now = dateRounded(this.timeSync)
+        var now = timeRounded(this.timeSync)
         this.players.forEach((v, i) => {
           let total = 0
           if (v.isOn === 1) {
@@ -189,7 +189,7 @@
       },
       clickPlayer (player) {
         let dif = 0
-        let now = dateRounded(this.timeSync)
+        let now = timeRounded(this.timeSync)
         dif = this.secDif(player.start, now)
         if (player.isOn === 1) {
           player.totalSecondsOn += dif
@@ -214,7 +214,7 @@
       cleanLog (logList, last, now, minSecs) {
         // We do not want multiple changes to the same Player logged
         // i.e. user made a mistake and quickly corrected (within 30 seconds)
-        if (last && ((now.getTime() - last['time'].getTime()) / 1000) < minSecs) {
+        if (last && ((now - last['time']) / 1000) < minSecs) {
           // ..when found, remove last log of this player and ignore this one
           logList.splice(logList.indexOf(last), 1)
           return false
@@ -239,7 +239,7 @@
         this.players.push({
           id: id,
           name: name,
-          start: dateRounded(this.timeSync),
+          start: timeRounded(this.timeSync),
           secondsOn: 0,
           totalSecondsOn: 0,
           isOn: -1
