@@ -1,7 +1,9 @@
 <template>
     <div class="game">
 
-        <h3 class="crumb"><router-link to="/">&larr; Done</router-link></h3>
+        <h3 class="crumb">
+            <router-link to="/">&larr; Done</router-link>
+        </h3>
         <div class="clear"></div>
 
         <h1>Game</h1>
@@ -62,8 +64,7 @@
         timeSync: 0,
         logId: 0,
         logList: [],
-        players: [
-        ]
+        players: []
       }
     },
     beforeCreate () {
@@ -120,16 +121,32 @@
         let dif = 0
         // Do not dif first sub
         let firstSub = player.isOn === -1
-        dif = this.secDif(player.start, dateRounded(this.timeSync))
+        let now = dateRounded(this.timeSync)
+        dif = this.secDif(player.start, now)
         if (player.isOn === 1) {
           player.totalSecondsOn += dif
           player.isOn = 0
         } else {
           player.isOn = 1
         }
-        player.start = dateRounded(this.timeSync)
-        if (firstSub || dif > 5) {
-          this.logList.unshift([ this.logId++, firstSub ? -1 : player.isOn, player, dif ])
+        player.start = now
+
+        // We do not want multiple changes to the same Player logged
+        // i.e. user made a mistake and quickly corrected (within 30 seconds)
+        let lastI = this.getLastLog(player.id, now, 30)
+        if (lastI > -1) {
+            // ..when found, remove last log of this player and ignore this one
+          this.logList.splice(lastI, 1)
+        } else {
+          this.logList.unshift([ this.logId++, firstSub ? -1 : player.isOn, player, dif, now ])
+        }
+      },
+      getLastLog (id, now, minSecs) {
+        let last = this.logList.find(log => log[2].id === id)
+        if (last && ((now.getTime() - last[4].getTime()) / 1000) < minSecs) {
+          return this.logList.indexOf(last)
+        } else {
+          return -1
         }
       }
     },
@@ -170,6 +187,7 @@
         list-style-type: none;
         padding: 0;
     }
+
     .player {
         padding: 17px 20px;
         border: 1px solid white;
@@ -177,17 +195,20 @@
         cursor: pointer;
         background: whitesmoke;
     }
+
     .player-name {
         font-weight: 500;
         text-align: left;
         min-width: 200px;
     }
+
     .player-seconds {
         min-width: 200px;
         font-weight: 200;
         text-align: right;
         float: right;
     }
+
     .player-on {
         border-radius: 2px;
         background: #40a2d9;
