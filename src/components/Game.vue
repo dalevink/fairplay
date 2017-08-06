@@ -94,6 +94,7 @@
     3: 'Game Ended'
   }
   console.log(gameStates)
+
   var formatTime = function (secs) {
     let min = Math.floor(secs / 60)
     let sec = secs - min * 60
@@ -104,6 +105,7 @@
     name: 'game',
     data () {
       return {
+        gameTimeLog: [],
         gameState: 0,
         timeSync: 0,
         logId: 0,
@@ -153,15 +155,22 @@
       // Start / End Game + Pause / Resume Play
       startGame () {
         this.gameState = 1
+        this.insertGameLog()
       },
       pausePlay () {
         this.gameState = 2
+        this.insertGameLog()
       },
       resumePlay () {
         this.gameState = 1
+        this.insertGameLog()
       },
       endGame () {
         this.gameState = 3
+      },
+      insertGameLog () {
+        this.gameTimeLog.unshift([ this.gameState, dateRounded(this.timeSync) ])
+        console.log(this.gameTimeLog)
       },
 
       timeSort (a, b) {
