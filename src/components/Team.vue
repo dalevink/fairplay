@@ -37,12 +37,10 @@
           <h3 v-show="visibility != 'active'"><a href="#/edit-players" :class="{ selected: visibility == 'active' }">&larr; Active Players</a></h3>
           <h3 v-show="visibility == 'active' && archivedPlayers.length"><a href="#/edit-players/archived" :class="{ selected: visibility == 'archived' }">View Deleted Players</a></h3>
       </section>
-
   </div>
 </template>
 
 <script>
-
 // visibility filters
 var filters = {
   all: function (players) {
