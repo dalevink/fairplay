@@ -6,6 +6,14 @@
         </h3>
         <div class="clear"></div>
 
+        <span>
+            {{ currentGameTime | formatTime }}
+            Game Time
+        </span>
+        <span v-show="currentPaused > 0">
+            {{ currentPaused | formatTime }}
+            Time Paused
+        </span>
         <div
                 v-show="gameState == 0"
         >
@@ -47,8 +55,6 @@
             <h1>End of Game</h1>
         </div>
 
-        <section>
-        </section>
         <transition-group name="anim-list" tag="ul" class="players">
             <li class="player"
                 v-for="player in playersFiltered"
@@ -105,8 +111,16 @@
     name: 'game',
     data () {
       return {
-        gameTimeLog: [],
         gameState: 0,
+        GameTimeLog: [],
+
+        totalGameTime: 0,
+        currentGameTime: 0,
+        totalPaused: 0,
+        currentPaused: 0,
+
+        timeStart: 0,
+
         timeSync: 0,
         logId: 0,
         logList: [],
@@ -147,18 +161,28 @@
       // Start / End Game + Pause / Resume Play
       startGame () {
         this.gameState = 1
+        this.timeStart = timeRounded(this.timeSync)
         this.insertGameLog()
       },
       pausePlay () {
         this.gameState = 2
+        let now = timeRounded(this.timeSync)
+        let dif = this.secDif(this.timeStart, now)
+        this.timeStart = timeRounded(this.timeSync)
+        this.totalGameTime += dif
         this.insertGameLog()
       },
       resumePlay () {
         this.gameState = 1
+        let now = timeRounded(this.timeSync)
+        let dif = this.secDif(this.timeStart, now)
+        this.timeStart = timeRounded(this.timeSync)
+        this.totalPaused += dif
         this.insertGameLog()
       },
       endGame () {
         this.gameState = 3
+        this.timeStart = 0
       },
       insertGameLog () {
         this.gameTimeLog.unshift([ this.gameState, timeRounded(this.timeSync) ])
@@ -171,22 +195,23 @@
       updateData () {
         var now = timeRounded(this.timeSync)
         this.players.forEach((v, i) => {
-          let total = 0
+          v.secondsOn = v.totalOn
           if (v.isOn === 1) {
-            total += this.secDif(v.start, now)
+            v.secondsOn += this.secDif(v.start, now)
           }
-          total += v.totalOn
-          v.secondsOn = total
         })
+        this.currentGameTime = this.totalGameTime +
+          (this.gameState === 1 ? this.secDif(this.timeStart, now) : 0)
+        this.currentPaused = this.totalPaused +
+          (this.gameState === 2 ? this.secDif(this.timeStart, now) : 0)
       },
       secDif (start, end) {
         return Math.floor((end - start) / 1000)
       },
       clickPlayer (player) {
-        let dif = 0
         let now = timeRounded(this.timeSync)
+        let dif = this.secDif(player.start, now)
 
-        dif = this.secDif(player.start, now)
         player.start = now
 
         if (player.isOn === 1) {
