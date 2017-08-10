@@ -22,7 +22,8 @@
                     class=""
                     @click="startGame()"
             >
-                Start Game</button>
+                Start Game
+            </button>
         </div>
 
         <div
@@ -32,7 +33,8 @@
             <button
                     @click="pausePlay()"
             >
-                Stop Play</button>
+                Stop Play
+            </button>
         </div>
 
         <div
@@ -42,11 +44,13 @@
             <button
                     @click="resumePlay()"
             >
-                Start Play</button>
+                Start Play
+            </button>
             <button
                     @click="endGame()"
             >
-                End Game</button>
+                End Game
+            </button>
         </div>
 
         <div
@@ -159,8 +163,8 @@
     methods: {
       // Start / End Game + Pause / Resume Play
       startGame () {
-        this.gameState = 1
         this.timeStart = timeRounded(this.timeSync)
+        this.calcTime(1)
       },
       pausePlay () {
         this.calcTime(2)
@@ -178,18 +182,29 @@
         this.timeStart = timeRounded(this.timeSync)
         if (state === 1 || state === 3) {
           this.totalPaused += dif
+          let now = timeRounded(this.timeSync)
+          this.players.forEach((v, i) => {
+            v.start = now
+          })
         } else {
           this.totalGameTime += dif
+          this.players.forEach((v, i) => {
+            if (v.isOn === 1) {
+              v.totalOn += this.secDif(v.start, now)
+            } else {
+              v.totalOff += this.secDif(v.start, now)
+            }
+          })
         }
       },
       timeSort (a, b) {
         return a.secondsOn < b.secondsOn ? 1 : -1
       },
       updateData () {
-        var now = timeRounded(this.timeSync)
+        let now = timeRounded(this.timeSync)
         this.players.forEach((v, i) => {
           v.secondsOn = v.totalOn
-          if (v.isOn === 1) {
+          if (v.isOn === 1 && this.gameState === 1) {
             v.secondsOn += this.secDif(v.start, now)
           }
         })
