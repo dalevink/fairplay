@@ -112,7 +112,6 @@
     data () {
       return {
         gameState: 0,
-        GameTimeLog: [],
 
         totalGameTime: 0,
         currentGameTime: 0,
@@ -162,33 +161,27 @@
       startGame () {
         this.gameState = 1
         this.timeStart = timeRounded(this.timeSync)
-        this.insertGameLog()
       },
       pausePlay () {
-        this.gameState = 2
-        let now = timeRounded(this.timeSync)
-        let dif = this.secDif(this.timeStart, now)
-        this.timeStart = timeRounded(this.timeSync)
-        this.totalGameTime += dif
-        this.insertGameLog()
+        this.calcTime(2)
       },
       resumePlay () {
-        this.gameState = 1
+        this.calcTime(1)
+      },
+      endGame () {
+        this.calcTime(3)
+      },
+      calcTime (state) {
+        this.gameState = state
         let now = timeRounded(this.timeSync)
         let dif = this.secDif(this.timeStart, now)
         this.timeStart = timeRounded(this.timeSync)
-        this.totalPaused += dif
-        this.insertGameLog()
+        if (state === 1 || state === 3) {
+          this.totalPaused += dif
+        } else {
+          this.totalGameTime += dif
+        }
       },
-      endGame () {
-        this.gameState = 3
-        this.timeStart = 0
-      },
-      insertGameLog () {
-        this.gameTimeLog.unshift([ this.gameState, timeRounded(this.timeSync) ])
-        console.log(this.gameTimeLog)
-      },
-
       timeSort (a, b) {
         return a.secondsOn < b.secondsOn ? 1 : -1
       },
