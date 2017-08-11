@@ -49,6 +49,8 @@ h1 {
 }
 
 .large-button {
+  line-height: 1;
+  width: 100%;
   padding: 20px;
   border: 1px solid white;
   border-radius: 4px;

@@ -2,11 +2,11 @@
     <div class="game">
 
         <div
+                class="top-buttons"
                 v-show="gameState == 0"
         >
-            <h1>New Game</h1>
             <button
-                    class=""
+                    class="large-button large-button-off"
                     @click="startGame()"
             >
                 Start Game
@@ -14,10 +14,11 @@
         </div>
 
         <div
+                class="top-buttons"
                 v-show="gameState == 1"
         >
-            <h1>Game On!</h1>
             <button
+                    class="large-button large-button-on"
                     @click="pausePlay()"
             >
                 Stop Play
@@ -25,29 +26,28 @@
         </div>
 
         <div
+                class="top-buttons"
                 v-show="gameState == 2"
         >
-            <h1>Time Stopped</h1>
             <button
+                    class="large-button large-button-off"
                     @click="resumePlay()"
             >
                 Start Play
             </button>
-            <button
-                    @click="endGame()"
-            >
-                End Game
-            </button>
         </div>
 
         <div
+                class="top-buttons"
                 v-show="gameState == 3"
         >
-            <h1>End of Game</h1>
+            <div class="large-button large-button-disabled">
+                End of Play
+            </div>
         </div>
 
         <section
-                :class="{ 'is-paused': gameState == 2 }"
+                :class="{ 'is-paused': gameState != 1, 'is-end': gameState == 3 }"
         >
             <div class="time-desc">
                 Game Time
@@ -71,13 +71,25 @@
             <li class="player"
                 v-for="player in playersFiltered"
                 :key="player.id"
-                :class="{ 'player-on': player.isOn === 1, 'player-time-stopped': gameState == 2 }"
+                :class="{ 'player-on': player.isOn === 1, 'player-time-stopped': gameState != 1 }"
                 @click="clickPlayer(player)"
             >
                 <strong class="player-name">{{ player.name }}</strong>
                 <span class="player-seconds">{{ player.secondsOn | formatTime }}</span>
             </li>
         </transition-group>
+
+        <div
+                class="top-buttons"
+                v-show="gameState == 2"
+        >
+            <button
+                    class="large-button large-button-end"
+                    @click="endGame()"
+            >
+                End Game
+            </button>
+        </div>
 
         <section v-show="logList.length">
             <h3>Recent Sub{{ logList.length | pluralize }}</h3>
@@ -90,6 +102,16 @@
                 </li>
             </ul>
         </section>
+
+        <div
+                v-show="gameState == 3"
+        >
+            <h3 class="crumb">
+                <router-link to="/">&larr; Done</router-link>
+            </h3>
+            <div class="clear"></div>
+        </div>
+
     </div>
 </template>
 
@@ -306,6 +328,10 @@
     @colorPause2: #ef811f;
     @colorPause3: #cd3b07;
 
+    .top-buttons {
+        margin-top: 25px;
+        margin-bottom: 20px;
+    }
     .players {
         list-style-type: none;
         padding: 0;
@@ -370,7 +396,30 @@
             color: @colorOff1;
         }
     }
+    .is-end {
+        .time-desc,
+        .time-large {
+            color: black;
+        }
+    }
     .time-paused-paused {
         color: @colorPause3;
+    }
+
+    .large-button-on {
+        background: @colorOn3;
+        color: white;
+    }
+    .large-button-disabled {
+        background: white;
+        color: @colorOff1;
+    }
+    .large-button-off {
+        background: @colorOff2;
+        color: white;
+    }
+    .large-button-end {
+        background: @colorPause3;
+        color: white;
     }
 </style>
