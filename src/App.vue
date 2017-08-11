@@ -70,6 +70,8 @@ h1 {
 .anim-list-move {
   transition: transform .2s;
 }
-
+.hidden {
+  visibility: hidden;
+}
 
 </style>

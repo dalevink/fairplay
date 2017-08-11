@@ -46,24 +46,32 @@
             <h1>End of Game</h1>
         </div>
 
-        <section>
-            <div class="time-large">
-                {{ currentGameTime | formatTime }}
-            </div>
+        <section
+                :class="{ 'is-paused': gameState == 2 }"
+        >
             <div class="time-desc">
                 Game Time
             </div>
+            <div class="time-large">
+                {{ currentGameTime | formatTime }}
+            </div>
         </section>
-        <span v-show="currentPaused > 0">
-            {{ currentPaused | formatTime }}
-            Time Paused
-        </span>
+        <section
+            :class="{ 'hidden': currentPaused < 1 }"
+        >
+            <div class="time-paused"
+                :class="{ 'time-paused-paused': gameState == 2 }"
+            >
+                {{ currentPaused | formatTime }}
+                Time Paused
+            </div>
+        </section>
 
         <transition-group name="anim-list" tag="ul" class="players">
             <li class="player"
                 v-for="player in playersFiltered"
                 :key="player.id"
-                :class="{ 'player-on': player.isOn === 1  }"
+                :class="{ 'player-on': player.isOn === 1, 'player-time-stopped': gameState == 2 }"
                 @click="clickPlayer(player)"
             >
                 <strong class="player-name">{{ player.name }}</strong>
@@ -281,7 +289,22 @@
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="less">
+
+    @colorOff0: #bbb;
+    @colorOff1: #999;
+    @colorOff2: #777;
+    @colorOff3: #333;
+    @colorOff4: #111;
+
+    @colorOn1: #a5cfe7;
+    @colorOn2: #6db5e7;
+    @colorOn3: #3f9de1;
+    @colorOn4: #51728a;
+
+    @colorPause1: #f1b22f;
+    @colorPause2: #ef811f;
+    @colorPause3: #cd3b07;
 
     .players {
         list-style-type: none;
@@ -311,13 +334,16 @@
 
     .player-on {
         border-radius: 2px;
-        background: #40a2d9;
+        background: @colorOn3;
         font-weight: 500;
         color: white;
     }
+    .player-on.player-time-stopped {
+        background: @colorOff1;
+    }
 
     .time-large {
-        color: #333;
+        color: @colorOn3;
         font-weight: 200;
         font-size: 350%;
         width: 100%;
@@ -325,10 +351,26 @@
         line-height: 1;
     }
     .time-desc {
-        color: #777;
+        color: mix(@colorOn3, black, 80%);
         font-size: 90%;
         line-height: 1;
         width: 100%;
         text-align: center;
+    }
+    .time-paused {
+        color: @colorOff1;
+        font-size: 90%;
+        line-height: 1;
+        width: 100%;
+        text-align: center;
+    }
+    .is-paused {
+        .time-desc,
+        .time-large {
+            color: @colorOff1;
+        }
+    }
+    .time-paused-paused {
+        color: @colorPause3;
     }
 </style>
