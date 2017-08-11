@@ -14,7 +14,7 @@ export default {
 
 html {
   box-sizing: border-box;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.5;
 }
 *, :after, :before {
@@ -37,7 +37,7 @@ h1 {
 }
 
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin-top: 30px;

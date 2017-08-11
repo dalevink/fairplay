@@ -1,19 +1,6 @@
 <template>
     <div class="game">
 
-        <h3 class="crumb">
-            <router-link to="/">&larr; Done</router-link>
-        </h3>
-        <div class="clear"></div>
-
-        <span>
-            {{ currentGameTime | formatTime }}
-            Game Time
-        </span>
-        <span v-show="currentPaused > 0">
-            {{ currentPaused | formatTime }}
-            Time Paused
-        </span>
         <div
                 v-show="gameState == 0"
         >
@@ -58,6 +45,19 @@
         >
             <h1>End of Game</h1>
         </div>
+
+        <section>
+            <div class="time-large">
+                {{ currentGameTime | formatTime }}
+            </div>
+            <div class="time-desc">
+                Game Time
+            </div>
+        </section>
+        <span v-show="currentPaused > 0">
+            {{ currentPaused | formatTime }}
+            Time Paused
+        </span>
 
         <transition-group name="anim-list" tag="ul" class="players">
             <li class="player"
@@ -314,5 +314,21 @@
         background: #40a2d9;
         font-weight: 500;
         color: white;
+    }
+
+    .time-large {
+        color: #333;
+        font-weight: 200;
+        font-size: 350%;
+        width: 100%;
+        text-align: center;
+        line-height: 1;
+    }
+    .time-desc {
+        color: #777;
+        font-size: 90%;
+        line-height: 1;
+        width: 100%;
+        text-align: center;
     }
 </style>
