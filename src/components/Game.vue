@@ -255,11 +255,17 @@
 
         player.start = now
 
+        // Only apply time when game on
+        if (this.gameState === 1) {
+          if (player.isOn === 1) {
+            player.totalOn += dif
+          } else {
+            player.totalOff += dif
+          }
+        }
         if (player.isOn === 1) {
-          player.totalOn += dif
           player.isOn = 0
         } else {
-          player.totalOff += dif
           player.isOn = 1
         }
 
