@@ -247,6 +247,9 @@
         return Math.floor((end - start) / 1000)
       },
       clickPlayer (player) {
+        if (this.gameState === 3) {
+          return
+        }
         let now = timeRounded(this.timeSync)
         let dif = this.secDif(player.start, now)
 
