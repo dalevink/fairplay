@@ -9,7 +9,7 @@
                     class="large-button large-button-off"
                     @click="startGame()"
             >
-                Start Game
+                Start Match
             </button>
         </div>
 
@@ -67,7 +67,7 @@
             </div>
         </section>
 
-        <team visibility="active"></team>
+        <team></team>
 
         <transition-group name="anim-list" tag="ul" class="players">
             <li class="player"
@@ -118,6 +118,14 @@
         >
             <h3 class="crumb">
                 <router-link to="/">&larr; Done</router-link>
+            </h3>
+            <div class="clear"></div>
+        </div>
+        <div
+                v-show="gameState == 0"
+        >
+            <h3 class="crumb">
+                <router-link to="/">&larr; Cancel</router-link>
             </h3>
             <div class="clear"></div>
         </div>

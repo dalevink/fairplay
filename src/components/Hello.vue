@@ -6,7 +6,7 @@
     </h1>
 
     <section>
-      <router-link class="large-button" to="/view-game">Start Game</router-link>
+      <router-link class="large-button" to="/play-game">New Match</router-link>
       <router-link class="large-button" to="/edit-players">Edit Players</router-link>
     </section>
   </div>

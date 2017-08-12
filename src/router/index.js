@@ -25,7 +25,7 @@ export default new Router({
       props: { visibility: 'archived' }
     },
     {
-      path: '/view-game',
+      path: '/play-game',
       name: 'View Game',
       component: Game
     }

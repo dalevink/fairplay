@@ -72,6 +72,9 @@ h1 {
 .anim-list-move {
   transition: transform .2s;
 }
+.anim-list-slow-move {
+  transition: transform 1s ease;
+}
 .hidden {
   visibility: hidden;
 }

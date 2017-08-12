@@ -1,68 +1,54 @@
 <template>
   <div class="team">
 
-      <transition-group name="anim-list" tag="ul" class="players-ul">
-        <li v-for="player in filteredPlayers"
+      <transition-group name="anim-list-slow" tag="ul" class="players-ul">
+        <li v-for="player in players"
             class="players-li"
             :key="player.id"
-            :class="{ archived: player.archived, 'player-editing': player == editingName }">
+            :class="{ 'player-editing': player == editingName || player.title === '' }">
           <div class="player-title">
             <label @click="editPlayer(player)">{{ player.title }}</label>
           </div>
           <input class="player-edit" type="text"
                  v-model="player.title"
                  v-player-focus="player == editingName"
+                 :placeholder="newPlaceholder(player)"
                  @blur="doneEdit(player)"
+                 @keyup="checkNew()"
+                 @click="editPlayer(player)"
                  @keyup.enter="doneEdit(player)"
                  @keyup.esc="cancelEdit(player)">
         </li>
-        <li :key="'active'" v-show="visibility == 'active'">
-          <input class="new-player"
-                 autofocus autocomplete="off"
-                 placeholder="Add a New Player"
-                 @blur="addPlayer"
-                 v-model="newPlayer"
-                 @keyup.enter="addPlayer">
-        </li>
       </transition-group>
       <footer class="footer">
-          <strong>{{ playerCount }}</strong> {{ visibility == 'archived' ? 'Deleted' : '' }} {{ playerCount | pluralize }}
+          <strong>{{ players.length }}</strong> {{ players.length | pluralize }}
       </footer>
-      <section>
-          <h3 v-show="visibility != 'active'"><a href="#/edit-players" :class="{ selected: visibility == 'active' }">&larr; Active Players</a></h3>
-          <h3 v-show="visibility == 'active' && archivedPlayers.length"><a href="#/edit-players/archived" :class="{ selected: visibility == 'archived' }">View Deleted Players</a></h3>
-      </section>
   </div>
 </template>
 
 <script>
-// visibility filters
-var filters = {
-  all: function (players) {
-    return players
-  },
-  active: function (players) {
-    return players.filter(function (player) {
-      return !player.archived
-    })
-  },
-  archived: function (players) {
-    return players.filter(function (player) {
-      return player.archived
-    })
-  }
-}
-
-import naturalSort from 'javascript-natural-sort'
+// import naturalSort from 'javascript-natural-sort'
 import localStore from '../localStore'
 export default {
   // app initial state
-  props: [ 'visibility' ],
+  props: {
+    players2: {
+      default: function () {
+        return []
+      },
+      type: Array
+    }
+  },
+
   data () {
     return localStore.fetch()
   },
 
   beforeCreate () {
+  },
+
+  created () {
+    this.checkNew()
   },
 
   // watch players change for localStorage persistence
@@ -78,15 +64,6 @@ export default {
   // computed properties
   // http://vuejs.org/guide/computed.html
   computed: {
-    filteredPlayers: function () {
-      return filters[this.visibility](this.players)
-    },
-    archivedPlayers: function () {
-      return filters['archived'](this.players)
-    },
-    playerCount: function () {
-      return this.filteredPlayers.length
-    }
   },
 
   filters: {
@@ -95,9 +72,12 @@ export default {
     }
   },
 
-  // methods that implement data logic.
-  // note there's no DOM manipulation here at all.
   methods: {
+    newPlaceholder (p) {
+      // We only want a placeholder on the last input
+      return this.players.indexOf(p) === this.players.length - 1 ? 'Enter a New Players Name' : ''
+    },
+
     addPlayer: function () {
       let value = this.newPlayer && this.newPlayer.trim()
       if (!value) {
@@ -105,18 +85,24 @@ export default {
       }
       this.players.push({
         id: this.uid++,
-        title: value,
-        archived: false
-      })
-      this.players = this.players.sort(function (a, b) {
-        return [ a.title, b.title ].sort(naturalSort)[0] === a.title ? -1 : 1
+        title: value
       })
       this.newPlayer = ''
     },
 
+    checkNew: function () {
+      if (this.players.every((player) => player.title !== '')) {
+        this.players.push({
+          id: this.uid++,
+          title: ''
+        })
+      }
+    },
     editPlayer: function (player) {
-      this.beforeEditCache = player.title
-      this.editingName = player
+      if (player !== this.editingName) {
+        this.beforeEditCache = player.title
+        this.editingName = player
+      }
     },
 
     doneEdit: function (player) {
@@ -125,13 +111,8 @@ export default {
       }
       this.editingName = false
       player.title = player.title.trim()
-      if (player.title === '') {
-        if (player.archived) {
-          this.players.splice(this.players.indexOf(player), 1)
-        } else {
-          player.title = this.beforeEditCache
-          player.archived = true
-        }
+      if (player.title === '' && this.beforeEditCache !== '') {
+        this.players.splice(this.players.indexOf(player), 1)
       }
     },
 
@@ -157,7 +138,10 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="less">
+
+@import "../assets/vars";
+
 .players-ul {
   width: 100%;
   list-style-type: none;
@@ -185,15 +169,7 @@ section {
     margin: 0;
 }
 .footer {
-    text-align: right;
-}
-.new-player {
-  padding: 20px;
-  border: 1px solid #ccc;
-  display: inline-block;
-  width: 100%;
-  font-size: 100%;
-  line-height: 20px;
+    text-align: center;
 }
 .player-edit {
   display: none;
@@ -206,15 +182,29 @@ section {
   background: whitesmoke;
   line-height: 20px;
 }
+.new-player,
 .player-editing .player-edit {
   display: block;
   width: 100%;
   padding: 20px;
-  border: 1px solid white;
   font-size: 100%;
   line-height: 20px;
+  border: 1px solid #ccc;
 }
 .player-editing .player-title {
   display: none;
+}
+.add-hint {
+    font-size: 90%;
+    color: @colorOn3;
+    text-align: right;
+    opacity: 0;
+    transition: 1s opacity ease;
+    padding: 5px;
+    margin-top: -20px;
+    font-weight: 600;
+}
+.add-hint-show {
+    opacity: 1;
 }
 </style>
