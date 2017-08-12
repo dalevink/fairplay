@@ -47,7 +47,7 @@
         </div>
 
         <section
-                :class="{ 'is-paused': gameState != 1, 'is-end': gameState == 3 }"
+                :class="{ 'is-stopped': gameState != 1, 'is-paused': gameState == 2, 'is-end': gameState == 3 }"
         >
             <div class="time-desc">
                 Game Time
@@ -60,7 +60,7 @@
             :class="{ 'hidden': currentPaused < 1 }"
         >
             <div class="time-paused"
-                :class="{ 'time-paused-paused': gameState == 2 }"
+                :class="{ 'time-paused-paused': gameState == 2 && currentPaused % 2 }"
             >
                 {{ currentPaused | formatTime }}
                 Time Paused
@@ -384,6 +384,7 @@
         width: 100%;
         text-align: center;
         line-height: 1;
+        transition: .5s ease color;
     }
     .time-desc {
         color: mix(@colorOn3, black, 80%);
@@ -391,6 +392,7 @@
         line-height: 1;
         width: 100%;
         text-align: center;
+        transition: .5s ease color;
     }
     .time-paused {
         color: @colorOff1;
@@ -398,11 +400,18 @@
         line-height: 1;
         width: 100%;
         text-align: center;
+        transition: .2s ease color;
+    }
+    .is-stopped {
+        .time-desc,
+        .time-large {
+            color: @colorOff1;
+        }
     }
     .is-paused {
         .time-desc,
         .time-large {
-            color: @colorOff1;
+            color: @colorPause3;
         }
     }
     .is-end {
@@ -413,6 +422,7 @@
     }
     .time-paused-paused {
         color: @colorPause3;
+        transition: .5s ease color;
     }
 
     .large-button-on {
