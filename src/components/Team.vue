@@ -1,11 +1,6 @@
 <template>
   <div class="team">
 
-    <h3 class="crumb"><router-link to="/">&larr; Done Editing</router-link></h3>
-    <div class="clear"></div>
-
-    <h1>Manage Players</h1>
-
       <transition-group name="anim-list" tag="ul" class="players-ul">
         <li v-for="player in filteredPlayers"
             class="players-li"
