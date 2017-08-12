@@ -21,7 +21,7 @@
         </li>
       </transition-group>
       <footer class="footer">
-          <strong>{{ players.length }}</strong> {{ players.length | pluralize }}
+          <strong>{{ players.length - 1 }}</strong> {{ players.length - 1 | pluralize }}
       </footer>
   </div>
 </template>
@@ -55,7 +55,8 @@ export default {
   watch: {
     players: {
       handler: function (players) {
-        localStore.save(this._data)
+        console.log(this)
+        localStore.save(this.$data)
       },
       deep: true
     }
