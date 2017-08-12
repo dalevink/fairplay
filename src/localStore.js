@@ -1,5 +1,5 @@
 // localStorage persistence
-var STORAGE_KEY = 'teamV029'
+var STORAGE_KEY = 'teamV030'
 export default {
   fetch: function () {
     var t = JSON.parse(localStorage.getItem(STORAGE_KEY))

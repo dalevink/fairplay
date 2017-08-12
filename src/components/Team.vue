@@ -104,7 +104,7 @@ export default {
   // note there's no DOM manipulation here at all.
   methods: {
     addPlayer: function () {
-      var value = this.newPlayer && this.newPlayer.trim()
+      let value = this.newPlayer && this.newPlayer.trim()
       if (!value) {
         return
       }

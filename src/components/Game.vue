@@ -67,6 +67,8 @@
             </div>
         </section>
 
+        <team visibility="active"></team>
+
         <transition-group name="anim-list" tag="ul" class="players">
             <li class="player"
                 v-for="player in playersFiltered"
@@ -125,8 +127,9 @@
 
 <script>
   import naturalSort from 'javascript-natural-sort'
+  import Team from './Team.vue'
 
-  var padLeft = function (string, pad, length) {
+  let padLeft = function (string, pad, length) {
     return (new Array(length + 1).join(pad) + string).slice(-length)
   }
   function timeRounded (syncWith) {
@@ -143,7 +146,7 @@
   }
   console.log(gameStates)
 
-  var formatTime = function (secs) {
+  let formatTime = function (secs) {
     let min = Math.floor(secs / 60)
     let sec = secs - min * 60
     return min + ':' + padLeft(sec, '0', 2)
@@ -167,6 +170,9 @@
         logList: [],
         players: []
       }
+    },
+    components: {
+      Team
     },
     beforeCreate () {
       if (this.timeSync === 0) {
@@ -318,20 +324,7 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
 
-    @colorOff0: #bbb;
-    @colorOff1: #999;
-    @colorOff2: #777;
-    @colorOff3: #333;
-    @colorOff4: #111;
-
-    @colorOn1: #a5cfe7;
-    @colorOn2: #6db5e7;
-    @colorOn3: #3f9de1;
-    @colorOn4: #51728a;
-
-    @colorPause1: #f1b22f;
-    @colorPause2: #ef811f;
-    @colorPause3: #cd3b07;
+    @import "../assets/vars";
 
     .top-buttons {
         margin-top: 25px;

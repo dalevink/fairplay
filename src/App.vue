@@ -10,7 +10,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
+
+@import "./assets/vars";
 
 html {
   box-sizing: border-box;
@@ -40,9 +42,7 @@ h1 {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  margin-top: 30px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 30px auto;
   padding-left: 20px;
   padding-right: 20px;
   max-width: 400px;
