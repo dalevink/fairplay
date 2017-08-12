@@ -12,13 +12,14 @@
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs",
-    "deploy": "node ./node_modules/vue-gh-pages/index.js"
+    "clean": "rm -rf dist/*",
+    "release": "npm run clean && npm run build",
+    "deploy": "cd dist && git add --all && git commit -m \"Release at $(date)\" && git push"
   },
   "dependencies": {
     "javascript-natural-sort": "^0.7.1",
     "moment": "^2.18.1",
     "vue": "^2.3.3",
-    "vue-gh-pages": "^1.4.0",
     "vue-router": "^2.3.1"
   },
   "devDependencies": {
