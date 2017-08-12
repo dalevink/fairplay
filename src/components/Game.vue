@@ -92,13 +92,21 @@
         </div>
 
         <section v-show="logList.length">
-            <h3>Recent Sub{{ logList.length | pluralize }}</h3>
+            <h4 class="sub-log-title">
+                Substitution{{ logList.length | pluralize }}
+                <span class="sub-log-title-right">Time On</span>
+            </h4>
             <ul class="sub-log">
-                <li class="log"
+                <li class="sub-log-li"
                     v-for="log in logList"
                     :key="logList['id']"
                 >
-                    <strong class="player-name">{{ log['player'].name }} {{ log | what }}</strong>
+                    <strong class="player-name">
+                        {{ log['logTime'] | formatTime }} {{ log['logPlayer'].name }} {{ log | logFormatDesc }}
+                        <span class="sub-log-right">
+                            {{ log['logTotalOn'] | logFormatTime }}
+                        </span>
+                    </strong>
                 </li>
             </ul>
         </section>
@@ -181,13 +189,14 @@
       formatTime: function (secs) {
         return formatTime(secs)
       },
+      logFormatTime: function (secs) {
+        return secs > 0 ? formatTime(secs) + '' : 'Starts'
+      },
+      logFormatDesc: function (log) {
+        return log['logTotalOn'] > 0 ? log['logDesc'] : ''
+      },
       pluralize: function (n) {
         return n === 1 ? '' : 's'
-      },
-      what: function (log) {
-        let howLong = log['logDif'] > 10 ? formatTime(log['logDif']) : ''
-        let what = log['logIsOn'] === 1 ? 'On' : 'Off'
-        return what + ' ' + howLong
       }
     },
     methods: {
@@ -250,46 +259,31 @@
         if (this.gameState === 3) {
           return
         }
-        let now = timeRounded(this.timeSync)
-        let dif = this.secDif(player.start, now)
 
-        player.start = now
+        let now = timeRounded(this.timeSync)
 
         // Only apply time when game on
+        let dif = 0
         if (this.gameState === 1) {
-          if (player.isOn === 1) {
-            player.totalOn += dif
-          } else {
-            player.totalOff += dif
-          }
+          dif = this.secDif(player.start, now)
         }
+        player.start = now
+
         if (player.isOn === 1) {
           player.isOn = 0
+          player.totalOn += dif
         } else {
           player.isOn = 1
+          player.totalOff += dif
         }
 
         this.logList.unshift({
           'id': this.logId++,
-          'player': player,
-          'logTime': now,
-          'logIsOn': player.isOn,
-          'logDif': dif
+          'logPlayer': player,
+          'logTime': this.currentGameTime,
+          'logDesc': player.isOn === 1 ? 'On' : 'Off',
+          'logTotalOn': player.totalOn
         })
-      },
-      cleanLog (logList, last, now, minSecs) {
-        // todo ::
-        // We do not want multiple changes to the same Player logged
-        // i.e. user made a mistake and quickly corrected (within 30 seconds)
-        // ..when found, remove last log of this player and ignore this one
-        // let last = this.logList.find(log => log.player === player)
-        // if (!last || this.cleanLog(this.logList, last, now, 15)) {
-        if (last && ((now - last['logTime']) / 1000) < minSecs) {
-          logList.splice(logList.indexOf(last), 1)
-          return false
-        } else {
-          return true
-        }
       }
     },
     created () {
@@ -308,6 +302,8 @@
           secondsOn: 0,
           totalOn: 0,
           totalOff: 0,
+          sessionOn: 0,
+          sessionOff: 0,
           isOn: -1
         })
       })
@@ -440,5 +436,35 @@
     .large-button-end {
         background: @colorPause3;
         color: white;
+    }
+
+    .sub-log {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+    .sub-log-title {
+        margin-bottom: 10px;
+        padding-left: 9px;
+        font-weight: 400;
+    }
+    .sub-log-title-right {
+        margin-bottom: 10px;
+        padding-right: 9px;
+        font-weight: 400;
+        float: right;
+        font-size: 87%;
+        line-height: 2;
+    }
+    .sub-log-li {
+        padding: 6px 10px;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        margin-top: -1px;
+        font-size: 87%;
+        color: @colorOff2;
+    }
+    .sub-log-right {
+        float: right;
     }
 </style>
