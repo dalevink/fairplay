@@ -5,6 +5,15 @@
 </template>
 
 <script>
+window.addEventListener('touchstart', function onFirstTouch () {
+  let d = document.documentElement
+  d.className = d.className.replace(/\bno-touch\b/, '')
+  // or set some global variable
+  window.user_touched = true
+  // we only need to know once that a human touched the screen, so we can stop listening now
+  window.removeEventListener('touchstart', onFirstTouch, false)
+}, false)
+
 export default {
   name: 'app'
 }
@@ -71,9 +80,6 @@ h1 {
 }
 .anim-list-move {
   transition: transform .2s;
-}
-.anim-list-slow-move {
-  transition: transform 1s ease;
 }
 .hidden {
   visibility: hidden;

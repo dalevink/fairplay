@@ -1,13 +1,27 @@
 // localStorage persistence
-var STORAGE_KEY = 'teamV043'
+
+let STORAGE_KEY = 'teamV057'
+var uid = 100
+var t
+
 export default {
   fetch: function () {
-    var t = JSON.parse(localStorage.getItem(STORAGE_KEY))
-    return t || {
-      players: [],
-      newPlayer: '',
-      editingName: false,
-      uid: 0
+    if (t === undefined) {
+      t = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { players2: [] }
+    }
+    return t
+  },
+  newPlayer: function (name) {
+    return {
+      id: uid++,
+      playerName: name,
+      start: 0,
+      secondsOn: 0,
+      totalOn: 0,
+      totalOff: 0,
+      sessionOn: 0,
+      sessionOff: 0,
+      isOn: -1
     }
   },
   save: function (data) {

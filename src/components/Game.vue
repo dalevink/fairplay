@@ -76,7 +76,7 @@
                 :class="{ 'player-on': player.isOn === 1, 'player-time-stopped': gameState != 1 }"
                 @click="clickPlayer(player)"
             >
-                <strong class="player-name">{{ player.name }}</strong>
+                <strong class="player-name">{{ player.playerName }}</strong>
                 <span class="player-seconds">{{ player.secondsOn | formatTime }}</span>
             </li>
         </transition-group>
@@ -104,7 +104,7 @@
                     :key="logList['id']"
                 >
                     <strong class="player-name">
-                        {{ log['logTime'] | formatTime }} {{ log['logPlayer'].name }} {{ log | logFormatDesc }}
+                        {{ log['logTime'] | formatTime }} {{ log['logPlayer'].playerName }} {{ log | logFormatDesc }}
                         <span class="sub-log-right">
                             {{ log['logTotalOn'] | logFormatTime }}
                         </span>
@@ -136,6 +136,7 @@
 <script>
   import naturalSort from 'javascript-natural-sort'
   import Team from './Team.vue'
+  import localStore from '../localStore'
 
   let padLeft = function (string, pad, length) {
     return (new Array(length + 1).join(pad) + string).slice(-length)
@@ -161,8 +162,8 @@
   }
 
   export default {
-    name: 'game',
     data () {
+      let common = localStore.fetch()
       return {
         gameState: 0,
 
@@ -176,7 +177,8 @@
         timeSync: 0,
         logId: 0,
         logList: [],
-        players: []
+
+        players2: common.players2
       }
     },
     components: {
@@ -190,10 +192,10 @@
 
     computed: {
       playersFiltered () {
-        let off = this.players.filter(function (p) {
+        let off = this.players2.filter(function (p) {
           return p.isOn !== 1
         }).sort(this.timeSort)
-        let on = this.players.filter(function (p) {
+        let on = this.players2.filter(function (p) {
           return p.isOn === 1
         }).sort(this.timeSort)
         return off.concat(on)
@@ -236,12 +238,12 @@
         if (state === 1 || state === 3) {
           this.totalPaused += dif
           let now = timeRounded(this.timeSync)
-          this.players.forEach((v, i) => {
+          this.players2.forEach((v, i) => {
             v.start = now
           })
         } else {
           this.totalGameTime += dif
-          this.players.forEach((v, i) => {
+          this.players2.forEach((v, i) => {
             if (v.isOn === 1) {
               v.totalOn += this.secDif(v.start, now)
             } else {
@@ -255,7 +257,7 @@
       },
       updateData () {
         let now = timeRounded(this.timeSync)
-        this.players.forEach((v, i) => {
+        this.players2.forEach((v, i) => {
           v.secondsOn = v.totalOn
           if (v.isOn === 1 && this.gameState === 1) {
             v.secondsOn += this.secDif(v.start, now)
@@ -301,17 +303,11 @@
       }
     },
     created () {
-      let players = [
-        'Luca',
-        'Zaid',
-        'Ben',
-        'Jackson'
-      ]
-      players.sort(naturalSort)
-      players.forEach((name, id) => {
-        this.players.push({
+      this.players2.sort(naturalSort)
+      /*
+        this.players2.push({
           id: id,
-          name: name,
+          playerName: name,
           start: timeRounded(this.timeSync),
           secondsOn: 0,
           totalOn: 0,
@@ -321,6 +317,7 @@
           isOn: -1
         })
       })
+      */
       this.updateData()
     },
     mounted () {

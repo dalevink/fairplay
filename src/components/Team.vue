@@ -1,27 +1,34 @@
 <template>
   <div class="team">
 
-      <transition-group name="anim-list-slow" tag="ul" class="players-ul">
-        <li v-for="player in players"
+      <ul class="players-ul">
+        <li v-for="player in playersWithNew"
             class="players-li"
             :key="player.id"
-            :class="{ 'player-editing': player == editingName || player.title === '' }">
-          <div class="player-title">
-            <label @click="editPlayer(player)">{{ player.title }}</label>
+            :class="{ 'player-editing': player == editingName || player.playerName === '' }">
+          <div class="player-name">
+                <span
+                        @click="editPlayer(player)"
+                        class="player-name-text">
+                    {{ player.playerName }}
+                </span>
+                <span
+                        @click="deletePlayer(player)"
+                        class="player-delete"></span>
           </div>
           <input class="player-edit" type="text"
-                 v-model="player.title"
+                 v-model="player.playerName"
                  v-player-focus="player == editingName"
                  :placeholder="newPlaceholder(player)"
                  @blur="doneEdit(player)"
-                 @keyup="checkNew()"
+                 @keyup="editPlayer(player)"
                  @click="editPlayer(player)"
                  @keyup.enter="doneEdit(player)"
                  @keyup.esc="cancelEdit(player)">
         </li>
-      </transition-group>
+      </ul>
       <footer class="footer">
-          <strong>{{ players.length - 1 }}</strong> {{ players.length - 1 | pluralize }}
+          <strong>{{ players2.length }}</strong> {{ players2.length | pluralize }}
       </footer>
   </div>
 </template>
@@ -32,7 +39,7 @@ import localStore from '../localStore'
 export default {
   // app initial state
   props: {
-    players2: {
+    players3: {
       default: function () {
         return []
       },
@@ -41,21 +48,23 @@ export default {
   },
 
   data () {
-    return localStore.fetch()
+    let common = localStore.fetch()
+    return {
+      players2: common.players2,
+      newPlayer: localStore.newPlayer(''),
+      editingName: false,
+      uid: 0
+    }
   },
 
   beforeCreate () {
   },
 
-  created () {
-    this.checkNew()
-  },
-
   // watch players change for localStorage persistence
   watch: {
-    players: {
-      handler: function (players) {
-        console.log(this)
+    players2: {
+      handler: function () {
+        // todo move
         localStore.save(this.$data)
       },
       deep: true
@@ -65,6 +74,10 @@ export default {
   // computed properties
   // http://vuejs.org/guide/computed.html
   computed: {
+    playersWithNew () {
+      // if (this.players2.every((player) => player.playerName !== '')) {
+      return this.players2.concat(this.newPlayer)
+    }
   },
 
   filters: {
@@ -76,50 +89,43 @@ export default {
   methods: {
     newPlaceholder (p) {
       // We only want a placeholder on the last input
-      return this.players.indexOf(p) === this.players.length - 1 ? 'Enter a New Players Name' : ''
+      return this.players2.indexOf(p) === -1 ? 'Enter a New Players Name' : ''
     },
 
-    addPlayer: function () {
-      let value = this.newPlayer && this.newPlayer.trim()
-      if (!value) {
-        return
-      }
-      this.players.push({
-        id: this.uid++,
-        title: value
-      })
-      this.newPlayer = ''
-    },
-
-    checkNew: function () {
-      if (this.players.every((player) => player.title !== '')) {
-        this.players.push({
-          id: this.uid++,
-          title: ''
-        })
-      }
-    },
     editPlayer: function (player) {
       if (player !== this.editingName) {
-        this.beforeEditCache = player.title
+        this.beforeEditCache = player.playerName
         this.editingName = player
+      }
+      this.checkNew(player)
+    },
+
+    checkNew (player) {
+      if (player.playerName && this.players2.indexOf(player) === -1) {
+        this.players2.push(player)
+        this.newPlayer = localStore.newPlayer('')
       }
     },
 
     doneEdit: function (player) {
       if (!this.editingName) {
+        this.checkNew(player)
         return
       }
-      this.editingName = false
-      player.title = player.title.trim()
-      if (player.title === '' && this.beforeEditCache !== '') {
-        this.players.splice(this.players.indexOf(player), 1)
+      player.playerName = player.playerName.trim()
+      if (player.playerName === '' && this.players2.indexOf(player) !== -1) {
+        this.deletePlayer(player)
       }
+      this.editingName = false
+    },
+
+    deletePlayer (player) {
+      this.players2.splice(this.players2.indexOf(player), 1)
     },
 
     cancelEdit: function (player) {
+      player.playerName = this.beforeEditCache
       this.editingName = false
-      player.title = this.beforeEditCache
     }
 
   },
@@ -175,13 +181,17 @@ section {
 .player-edit {
   display: none;
 }
-.player-title label {
+.player-name {
   display: block;
+  font-weight: 500;
   width: 100%;
   padding: 20px;
   border: 1px solid white;
   background: whitesmoke;
   line-height: 20px;
+}
+.player-name-text {
+    cursor: pointer;
 }
 .new-player,
 .player-editing .player-edit {
@@ -192,7 +202,7 @@ section {
   line-height: 20px;
   border: 1px solid #ccc;
 }
-.player-editing .player-title {
+.player-editing .player-name {
   display: none;
 }
 .add-hint {
@@ -207,5 +217,29 @@ section {
 }
 .add-hint-show {
     opacity: 1;
+}
+.player-delete {
+    color: @colorOff0;
+    font-weight: 600;
+    float: right;
+    padding: 10px;
+    margin-top: -8px;
+    margin-right: -8px;
+    border-radius: 25px;
+    line-height: 1;
+    min-width: 37px;
+    text-align: center;
+    cursor: pointer;
+    background: whitesmoke;
+    transition: .1s background-color,color ease;
+    &::before {
+        content: "×";
+    }
+    .no-touch & {
+        &:hover {
+           background: @colorPause2;
+           color: white;
+        }
+    }
 }
 </style>
