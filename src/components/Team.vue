@@ -116,7 +116,12 @@ export default {
       if (player.playerName === '' && this.players2.indexOf(player) !== -1) {
         this.deletePlayer(player)
       }
-      this.editingName = false
+      // If on last Player then focus New Player
+      if (this.players2.indexOf(player) === this.players2.length - 1) {
+        this.editingName = this.newPlayer
+      } else {
+        this.editingName = false
+      }
     },
 
     deletePlayer (player) {
