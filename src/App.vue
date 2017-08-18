@@ -57,7 +57,7 @@ h1 {
   max-width: 400px;
 }
 
-.large-button {
+.button-large {
   line-height: 1;
   font-size: 100%;
   width: 100%;
@@ -70,23 +70,23 @@ h1 {
   display: block;
   color: @colorOn3;
 }
-.large-button-on {
+.button-large-on {
   background: @colorOn3;
   color: white;
 }
-.large-button-disabled {
+.button-large-disabled {
   background: white;
   color: @colorOff1;
 }
-.large-button-off {
+.button-large-off {
   background: @colorOff2;
   color: white;
 }
-.large-button-end {
+.button-large-end {
   background: @colorPause3;
   color: white;
 }
-.large-button-min {
+.button-large-min {
   background: white;
   font-size: 100%;
   color: @colorOn3;

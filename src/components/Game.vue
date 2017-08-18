@@ -6,7 +6,7 @@
                 v-show="gameState == 0"
         >
             <button
-                    class="large-button large-button-off"
+                    class="button-large button-large-off"
                     @click="startGame()"
             >
                 Start Match
@@ -18,7 +18,7 @@
                 v-show="gameState == -2 && players2.length > 1"
         >
             <button
-                    class="large-button"
+                    class="button-large"
                     @click="savePlayers()"
             >
                 Done Editing…
@@ -29,7 +29,7 @@
                 v-show="gameState == -2 && players2.length <= 1"
         >
             <button
-                    class="large-button large-button-disabled"
+                    class="button-large button-large-disabled"
             >
                 Add Players
             </button>
@@ -40,7 +40,7 @@
                 v-show="gameState == 1"
         >
             <button
-                    class="large-button large-button-on"
+                    class="button-large button-large-on"
                     @click="pausePlay()"
             >
                 Stop Play
@@ -52,7 +52,7 @@
                 v-show="gameState == 2"
         >
             <button
-                    class="large-button large-button-off"
+                    class="button-large button-large-off"
                     @click="resumePlay()"
             >
                 Start Play
@@ -63,7 +63,7 @@
                 class="top-buttons"
                 v-show="gameState == 3"
         >
-            <div class="large-button large-button-disabled">
+            <div class="button-large button-large-disabled">
                 End of Play
             </div>
         </div>
@@ -113,7 +113,7 @@
                     v-show="gameState == 2"
             >
                 <button
-                        class="large-button large-button-end"
+                        class="button-large button-large-end"
                         @click="endGame()"
                 >
                     End Game
@@ -146,7 +146,7 @@
                 v-show="gameState == 0"
         >
             <button
-                    class="large-button large-button-min"
+                    class="button-large button-large-min"
                     @click="editPlayers()"
             >
                 Add or Change Players
@@ -157,7 +157,7 @@
                 v-show="gameState == -2 && players2.length > 1"
         >
             <button
-                    class="large-button"
+                    class="button-large"
                     @click="savePlayers()"
             >
                 Done Editing…
