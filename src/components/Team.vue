@@ -49,9 +49,10 @@ export default {
 
   data () {
     let common = localStore.fetch()
+    let newPlayer = localStore.newPlayer('')
     return {
       players2: common.players2,
-      newPlayer: localStore.newPlayer(''),
+      newPlayer: newPlayer,
       editingName: false,
       uid: 0
     }
@@ -181,7 +182,9 @@ section {
     margin: 0;
 }
 .footer {
-    text-align: center;
+    text-align: right;
+    font-size: 90%;
+    color: @colorOff1;
 }
 .player-edit {
   display: none;
@@ -191,7 +194,8 @@ section {
   font-weight: 500;
   width: 100%;
   padding: 20px;
-  border: 1px solid white;
+  border: 1px solid #ccc;
+  margin-bottom: 3px;
   background: whitesmoke;
   line-height: 20px;
 }
@@ -205,7 +209,13 @@ section {
   padding: 20px;
   font-size: 100%;
   line-height: 20px;
+  margin-bottom: 3px;
   border: 1px solid #ccc;
+    &:focus {
+        border-color: @colorOn2;
+        outline: 0;
+        box-shadow: 0 0 2px 2px rgba(red(@colorOn2),green(@colorOn2),blue(@colorOn2),.4);
+    }
 }
 .player-editing .player-name {
   display: none;
@@ -224,15 +234,16 @@ section {
     opacity: 1;
 }
 .player-delete {
-    color: @colorOff0;
+    color: @colorOff1;
     font-weight: 600;
     float: right;
     padding: 10px;
     margin-top: -8px;
     margin-right: -8px;
-    border-radius: 25px;
+    border-radius: 30px;
+    border: 1px solid mix(white, @colorOff0, 50%);
     line-height: 1;
-    min-width: 37px;
+    min-width: 40px;
     text-align: center;
     cursor: pointer;
     background: whitesmoke;

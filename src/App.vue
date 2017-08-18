@@ -59,6 +59,7 @@ h1 {
 
 .large-button {
   line-height: 1;
+  font-size: 100%;
   width: 100%;
   padding: 20px;
   border: 1px solid white;
@@ -67,8 +68,31 @@ h1 {
   background: whitesmoke;
   text-align: center;
   display: block;
-  font-size: 130%;
+  color: @colorOn3;
 }
+.large-button-on {
+  background: @colorOn3;
+  color: white;
+}
+.large-button-disabled {
+  background: white;
+  color: @colorOff1;
+}
+.large-button-off {
+  background: @colorOff2;
+  color: white;
+}
+.large-button-end {
+  background: @colorPause3;
+  color: white;
+}
+.large-button-min {
+  background: white;
+  font-size: 100%;
+  color: @colorOn3;
+  border: 1px solid @colorOn1;
+}
+
 
 .clear {
   clear: both;

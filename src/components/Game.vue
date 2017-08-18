@@ -15,6 +15,28 @@
 
         <div
                 class="top-buttons"
+                v-show="gameState == -2 && players2.length > 1"
+        >
+            <button
+                    class="large-button"
+                    @click="savePlayers()"
+            >
+                Done Editing…
+            </button>
+        </div>
+        <div
+                class="top-buttons"
+                v-show="gameState == -2 && players2.length <= 1"
+        >
+            <button
+                    class="large-button large-button-disabled"
+            >
+                Add Players
+            </button>
+        </div>
+
+        <div
+                class="top-buttons"
                 v-show="gameState == 1"
         >
             <button
@@ -67,51 +89,80 @@
             </div>
         </section>
 
-        <team></team>
+        <team
+                v-if="gameState === -2"
+        ></team>
 
-        <transition-group name="anim-list" tag="ul" class="players">
-            <li class="player"
-                v-for="player in playersFiltered"
-                :key="player.id"
-                :class="{ 'player-on': player.isOn === 1, 'player-time-stopped': gameState != 1 }"
-                @click="clickPlayer(player)"
+        <section
+                v-if="gameState > -1"
+        >
+            <transition-group name="anim-list" tag="ul" class="players">
+                <li class="player"
+                    v-for="player in playersFiltered"
+                    :key="player.id"
+                    :class="{ 'player-on': player.isOn === 1, 'player-time-stopped': gameState != 1 }"
+                    @click="clickPlayer(player)"
+                >
+                    <strong class="player-name">{{ player.playerName }}</strong>
+                    <span class="player-seconds">{{ player.secondsOn | formatTime }}</span>
+                </li>
+            </transition-group>
+
+            <div
+                    class="top-buttons"
+                    v-show="gameState == 2"
             >
-                <strong class="player-name">{{ player.playerName }}</strong>
-                <span class="player-seconds">{{ player.secondsOn | formatTime }}</span>
-            </li>
-        </transition-group>
+                <button
+                        class="large-button large-button-end"
+                        @click="endGame()"
+                >
+                    End Game
+                </button>
+            </div>
+
+            <section v-show="logList.length">
+                <h4 class="sub-log-title">
+                    Substitution{{ logList.length | pluralize }}
+                    <span class="sub-log-title-right">Time On</span>
+                </h4>
+                <ul class="sub-log">
+                    <li class="sub-log-li"
+                        v-for="log in logList"
+                        :key="logList['id']"
+                    >
+                        <strong class="player-name">
+                            {{ log['logTime'] | formatTime }} {{ log['logPlayer'].playerName }} {{ log | logFormatDesc }}
+                            <span class="sub-log-right">
+                                {{ log['logTotalOn'] | logFormatTime }}
+                            </span>
+                        </strong>
+                    </li>
+                </ul>
+            </section>
+        </section>
 
         <div
                 class="top-buttons"
-                v-show="gameState == 2"
+                v-show="gameState == 0"
         >
             <button
-                    class="large-button large-button-end"
-                    @click="endGame()"
+                    class="large-button large-button-min"
+                    @click="editPlayers()"
             >
-                End Game
+                Add or Change Players
             </button>
         </div>
-
-        <section v-show="logList.length">
-            <h4 class="sub-log-title">
-                Substitution{{ logList.length | pluralize }}
-                <span class="sub-log-title-right">Time On</span>
-            </h4>
-            <ul class="sub-log">
-                <li class="sub-log-li"
-                    v-for="log in logList"
-                    :key="logList['id']"
-                >
-                    <strong class="player-name">
-                        {{ log['logTime'] | formatTime }} {{ log['logPlayer'].playerName }} {{ log | logFormatDesc }}
-                        <span class="sub-log-right">
-                            {{ log['logTotalOn'] | logFormatTime }}
-                        </span>
-                    </strong>
-                </li>
-            </ul>
-        </section>
+        <div
+                class="top-buttons"
+                v-show="gameState == -2 && players2.length > 1"
+        >
+            <button
+                    class="large-button"
+                    @click="savePlayers()"
+            >
+                Done Editing…
+            </button>
+        </div>
 
         <div
                 v-show="gameState == 3"
@@ -121,14 +172,7 @@
             </h3>
             <div class="clear"></div>
         </div>
-        <div
-                v-show="gameState == 0"
-        >
-            <h3 class="crumb">
-                <router-link to="/">&larr; Cancel</router-link>
-            </h3>
-            <div class="clear"></div>
-        </div>
+
 
     </div>
 </template>
@@ -165,7 +209,7 @@
     data () {
       let common = localStore.fetch()
       return {
-        gameState: 0,
+        gameState: common.players2.length > 1 ? 0 : -2,
 
         totalGameTime: 0,
         currentGameTime: 0,
@@ -229,6 +273,12 @@
       },
       endGame () {
         this.calcTime(3)
+      },
+      savePlayers () {
+        this.gameState = 0
+      },
+      editPlayers () {
+        this.gameState = -2
       },
       calcTime (state) {
         this.gameState = state
@@ -341,7 +391,7 @@
     }
 
     .player {
-        padding: 17px 20px;
+        padding: 18px 20px;
         border: 1px solid white;
         border-radius: 4px;
         cursor: pointer;
@@ -417,23 +467,6 @@
     .time-paused-paused {
         color: @colorPause3;
         transition: .5s ease color;
-    }
-
-    .large-button-on {
-        background: @colorOn3;
-        color: white;
-    }
-    .large-button-disabled {
-        background: white;
-        color: @colorOff1;
-    }
-    .large-button-off {
-        background: @colorOff2;
-        color: white;
-    }
-    .large-button-end {
-        background: @colorPause3;
-        color: white;
     }
 
     .sub-log {
