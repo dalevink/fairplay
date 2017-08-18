@@ -1,6 +1,10 @@
-# fairplay
+# FairPlay
 
 > Give everyone a fair play in sport
+
+## Live Demo
+
+[https://dalevink.github.io/fairplay/#/](https://dalevink.github.io/fairplay/#/)
 
 ## Build Setup
 
@@ -13,9 +17,6 @@ npm run dev
 
 # build for production with minification
 npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
 
 # run unit tests
 npm run unit
