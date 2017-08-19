@@ -37,14 +37,12 @@
             </button>
         </div>
 
-        <div
-                class="top-buttons"
+        <h1
+                class="top-buttons heading"
                 v-show="gameState == 3"
         >
-            <div class="button-large button-large-disabled">
-                End of Play
-            </div>
-        </div>
+            End of Play
+        </h1>
 
         <section
                 v-if="gameState > 0"

@@ -49,6 +49,15 @@ h1 {
   max-width: 400px;
 }
 
+.heading {
+  line-height: 1;
+  font-size: 120%;
+  width: 100%;
+  padding: 20px;
+  text-align: center;
+  display: block;
+  color: @colorOff4;
+}
 .button-large {
   line-height: 1;
   font-size: 100%;
@@ -68,7 +77,8 @@ h1 {
 }
 .button-large-disabled {
   background: white;
-  color: @colorOff1;
+  color: @colorOff2;
+  cursor: default;
 }
 .button-large-off {
   background: @colorOff2;

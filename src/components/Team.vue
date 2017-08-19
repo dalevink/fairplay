@@ -4,14 +4,14 @@
       <div
               class="top-buttons"
       >
-          <div class="button-large button-large-disabled">
+          <h1 class="heading">
               <span v-if="isStart">
                 Add Players to Start
               </span>
               <span v-if="!isStart">
                 Add or Change Players
               </span>
-          </div>
+          </h1>
       </div>
 
       <ul class="players-ul">
