@@ -3,7 +3,7 @@
 
         <div
                 class="top-buttons"
-                v-show="gameState == 0"
+                v-show="gameState == store.START"
         >
             <button
                     class="button-large button-large-on"
@@ -15,7 +15,7 @@
 
         <div
                 class="top-buttons"
-                v-show="gameState == 1"
+                v-show="gameState == store.PLAYING"
         >
             <button
                     class="button-large button-large-min"
@@ -27,7 +27,7 @@
 
         <div
                 class="top-buttons"
-                v-show="gameState == 2"
+                v-show="gameState == store.PAUSED"
         >
             <button
                     class="button-large button-large-min"
@@ -39,16 +39,16 @@
 
         <h1
                 class="top-buttons heading"
-                v-show="gameState == 3"
+                v-show="gameState == store.END"
         >
             End of Play
         </h1>
 
         <section
-                v-if="gameState > 0"
+                v-if="gameState > store.START"
         >
             <section
-                    :class="{ 'is-stopped': gameState != 1, 'is-paused': gameState == 2, 'is-end': gameState == 3 }"
+                    :class="{ 'is-stopped': gameState != store.PLAYING, 'is-paused': gameState == store.PAUSED, 'is-end': gameState == store.END }"
             >
                 <div class="time-desc">
                     Game Time
@@ -61,7 +61,7 @@
                 :class="{ 'hidden': currentPaused < 1 }"
             >
                 <div class="time-paused"
-                    :class="{ 'time-paused-paused': gameState == 2, 'time-paused-paused-flash': gameState == 2 && currentPaused % 2 }"
+                    :class="{ 'time-paused-paused': gameState == store.PAUSED, 'time-paused-paused-flash': gameState == store.PAUSED && currentPaused % 2 }"
                 >
                     Play Stopped for {{ currentPaused | formatTime }}
                 </div>
@@ -69,17 +69,17 @@
         </section>
 
         <team
-                v-if="gameState === -2"
+                v-if="gameState === store.EDIT"
         ></team>
 
         <section
-                v-if="gameState > -1"
+                v-if="gameState >= store.START"
         >
             <transition-group name="anim-list" tag="ul" class="players">
                 <li class="player"
                     v-for="player in playersFiltered"
                     :key="player.id"
-                    :class="{ 'player-on': player.isOn === 1, 'player-time-stopped': gameState != 1 }"
+                    :class="{ 'player-on': player.isOn === 1, 'player-time-stopped': gameState != store.PLAYING }"
                     @click="clickPlayer(player)"
                 >
                     <strong class="player-name">{{ player.playerName }}</strong>
@@ -91,7 +91,7 @@
 
         <div
                 class="top-buttons"
-                v-show="gameState == 2"
+                v-show="gameState == store.PAUSED"
         >
             <button
                     class="button-large button-large-off"
@@ -103,7 +103,7 @@
 
         <div
                 class="top-buttons"
-                v-show="gameState == 0"
+                v-show="gameState == store.START"
         >
             <button
                     class="button-large button-large-min"
@@ -114,7 +114,7 @@
         </div>
         <div
                 class=""
-                v-show="gameState == -2 && players2.length > 0"
+                v-show="gameState == store.EDIT && players2.length > 0"
         >
             <button
                     class="button-large button-large-on"
@@ -127,7 +127,7 @@
 
         <div
                 class="top-buttons"
-                v-show="gameState == 3"
+                v-show="gameState == store.END"
         >
             <button
                     class="button-large button-large-min"
@@ -138,7 +138,7 @@
         </div>
 
         <section
-                v-if="gameState > -1 && logList.length"
+                v-if="gameState >= store.START && logList.length"
         >
             <h4 class="sub-log-title">
                 Substitution{{ logList.length | pluralize }}
@@ -165,7 +165,7 @@
 <script>
   import naturalSort from 'javascript-natural-sort'
   import Team from './Team.vue'
-  import localStore from '../localStore'
+  import store from '../store'
 
   let padLeft = function (string, pad, length) {
     return (new Array(length + 1).join(pad) + string).slice(-length)
@@ -176,14 +176,6 @@
     let dif = Math.round((now - syncWith) / 1000) * 1000
     return new Date(syncWith + dif).getTime()
   }
-  const gameStates = {
-    0: 'New Game',
-    1: 'Play Started',
-    2: 'Play Started',
-    3: 'Game Ended'
-  }
-  console.log(gameStates)
-
   let formatTime = function (secs) {
     let min = Math.floor(secs / 60)
     let sec = secs - min * 60
@@ -191,7 +183,7 @@
   }
 
   let newGame = function () {
-    let d = localStore.fetch()
+    let d = store.fetch()
     // console.log(d)
     return d
   }
@@ -199,7 +191,8 @@
   export default {
     data () {
       let o = newGame()
-      o.gameState = o.players2.length > 1 ? 0 : -2
+      o.gameState = o.players2.length > 1 ? store.START : store.EDIT
+      o.store = store
       return o
     },
     components: {
@@ -240,33 +233,33 @@
       // Start / End Game + Pause / Resume Play
       startGame () {
         this.timeStart = timeRounded(this.timeSync)
-        this.calcTime(1)
+        this.calcTime(store.PLAYING)
       },
       pausePlay () {
-        this.calcTime(2)
+        this.calcTime(store.PAUSED)
       },
       resumePlay () {
-        this.calcTime(1)
+        this.calcTime(store.PLAYING)
       },
       endGame () {
-        this.calcTime(3)
+        this.calcTime(store.END)
       },
       savePlayers () {
-        this.gameState = 0
+        this.gameState = store.START
       },
       editPlayers () {
-        this.gameState = -2
+        this.gameState = store.EDIT
         // console.log(this.gameState)
       },
       clearGame () {
-        Object.assign(this.$data, localStore.resetGame())
+        Object.assign(this.$data, store.resetGame())
       },
       calcTime (state) {
         this.gameState = state
         let now = timeRounded(this.timeSync)
         let dif = this.secDif(this.timeStart, now)
         this.timeStart = timeRounded(this.timeSync)
-        if (state === 1 || state === 3) {
+        if (this.gameState === store.PLAYING || this.gameState === store.END) {
           this.totalPaused += dif
           let now = timeRounded(this.timeSync)
           this.players2.forEach((v, i) => {
@@ -290,20 +283,20 @@
         let now = timeRounded(this.timeSync)
         this.players2.forEach((v, i) => {
           v.secondsOn = v.totalOn
-          if (v.isOn === 1 && this.gameState === 1) {
+          if (v.isOn === 1 && this.gameState === store.PLAYING) {
             v.secondsOn += this.secDif(v.start, now)
           }
         })
         this.currentGameTime = this.totalGameTime +
-          (this.gameState === 1 ? this.secDif(this.timeStart, now) : 0)
+          (this.gameState === store.PLAYING ? this.secDif(this.timeStart, now) : 0)
         this.currentPaused = this.totalPaused +
-          (this.gameState === 2 ? this.secDif(this.timeStart, now) : 0)
+          (this.gameState === store.PAUSED ? this.secDif(this.timeStart, now) : 0)
       },
       secDif (start, end) {
         return Math.floor((end - start) / 1000)
       },
       clickPlayer (player) {
-        if (this.gameState === 3) {
+        if (this.gameState === store.END) {
           return
         }
 
@@ -311,7 +304,7 @@
 
         // Only apply time when game on
         let dif = 0
-        if (this.gameState === 1) {
+        if (this.gameState === store.PLAYING) {
           dif = this.secDif(player.start, now)
         }
         player.start = now

@@ -45,7 +45,7 @@
 
 <script>
 // import naturalSort from 'javascript-natural-sort'
-import localStore from '../localStore'
+import store from '../store'
 export default {
   // app initial state
   props: {
@@ -58,8 +58,8 @@ export default {
   },
 
   data () {
-    let common = localStore.fetch()
-    let newPlayer = localStore.newPlayer('')
+    let common = store.fetch()
+    let newPlayer = store.newPlayer('')
     return {
       players2: common.players2,
       newPlayer: newPlayer,
@@ -76,7 +76,7 @@ export default {
   watch: {
     players2: {
       handler: function () {
-        localStore.save()
+        store.save()
       },
       deep: true
     }
@@ -111,7 +111,7 @@ export default {
     checkNew (player) {
       if (player.playerName && this.players2.indexOf(player) === -1) {
         this.players2.push(player)
-        this.newPlayer = localStore.newPlayer('')
+        this.newPlayer = store.newPlayer('')
       }
     },
 
@@ -200,6 +200,7 @@ section {
   margin-bottom: 2px;
   background: whitesmoke;
   line-height: 1.4;
+  color: mix(@colorOn3, @colorOff4, 85%);
 }
 .player-name-text {
     cursor: pointer;
