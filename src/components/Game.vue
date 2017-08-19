@@ -61,10 +61,9 @@
                 :class="{ 'hidden': currentPaused < 1 }"
             >
                 <div class="time-paused"
-                    :class="{ 'time-paused-paused': gameState == 2 && currentPaused % 2 }"
+                    :class="{ 'time-paused-paused': gameState == 2, 'time-paused-paused-flash': gameState == 2 && currentPaused % 2 }"
                 >
-                    {{ currentPaused | formatTime }}
-                    Play Stopped
+                    Play Stopped for {{ currentPaused | formatTime }}
                 </div>
             </section>
         </section>
@@ -88,25 +87,6 @@
                 </li>
             </transition-group>
 
-            <section v-show="logList.length">
-                <h4 class="sub-log-title">
-                    Substitution{{ logList.length | pluralize }}
-                    <span class="sub-log-title-right">Time On</span>
-                </h4>
-                <ul class="sub-log">
-                    <li class="sub-log-li"
-                        v-for="log in logList"
-                        :key="logList['id']"
-                    >
-                        <strong class="player-name">
-                            {{ log['logTime'] | formatTime }} {{ log['logPlayer'].playerName }} {{ log | logFormatDesc }}
-                            <span class="sub-log-right">
-                                {{ log['logTotalOn'] | logFormatTime }}
-                            </span>
-                        </strong>
-                    </li>
-                </ul>
-            </section>
         </section>
 
         <div
@@ -156,6 +136,28 @@
                 Clear Game and Start Over
             </button>
         </div>
+
+        <section
+                v-if="gameState > -1 && logList.length"
+        >
+            <h4 class="sub-log-title">
+                Substitution{{ logList.length | pluralize }}
+                <span class="sub-log-title-right">Time On</span>
+            </h4>
+            <ul class="sub-log">
+                <li class="sub-log-li"
+                    v-for="log in logList"
+                    :key="logList['id']"
+                >
+                    <strong class="player-name">
+                        {{ log['logTime'] | formatTime }} {{ log['logPlayer'].playerName }} {{ log | logFormatDesc }}
+                        <span class="sub-log-right">
+                            {{ log['logTotalOn'] | logFormatTime }}
+                        </span>
+                    </strong>
+                </li>
+            </ul>
+        </section>
 
     </div>
 </template>
@@ -356,9 +358,9 @@
     }
 
     .player {
-        padding: 18px 20px;
+        padding: @grid3;
         border: 1px solid white;
-        border-radius: 4px;
+        border-radius: 2px;
         cursor: pointer;
         background: whitesmoke;
     }
@@ -430,6 +432,10 @@
         }
     }
     .time-paused-paused {
+        color: @colorOff4;
+        transition: .5s ease color;
+    }
+    .time-paused-paused-flash {
         color: @colorPause3;
         transition: .5s ease color;
     }

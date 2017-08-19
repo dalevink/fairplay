@@ -195,11 +195,11 @@ section {
   display: block;
   font-weight: 500;
   width: 100%;
-  padding: 20px;
+  padding: @grid3;
   border: 1px solid #ccc;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   background: whitesmoke;
-  line-height: 20px;
+  line-height: 1.4;
 }
 .player-name-text {
     cursor: pointer;
@@ -208,10 +208,10 @@ section {
 .player-editing .player-edit {
   display: block;
   width: 100%;
-  padding: 20px;
+  padding: @grid3;
   font-size: 100%;
-  line-height: 20px;
-  margin-bottom: 3px;
+  line-height: 1.4;
+  margin-bottom: 2px;
   border: 1px solid #ccc;
     &:focus {
         border-color: @colorOn2;
@@ -239,13 +239,12 @@ section {
     color: @colorOff1;
     font-weight: 600;
     float: right;
-    padding: 10px;
-    margin-top: -8px;
-    margin-right: -8px;
+    padding: 7px;
+    margin-top: -4px;
     border-radius: 30px;
     border: 1px solid mix(white, @colorOff0, 50%);
     line-height: 1;
-    min-width: 40px;
+    min-width: 35px;
     text-align: center;
     cursor: pointer;
     background: whitesmoke;
