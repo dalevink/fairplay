@@ -3,7 +3,4 @@
 
 > Give everyone a fair play in sport
 
-[[https://github.com/dalevink/fairplay/blob/master/src/assets/fairplay-screen-recording.gif|alt=FairPlay Screen Recording]]
-
-
 
