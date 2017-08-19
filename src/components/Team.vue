@@ -36,7 +36,7 @@
                  @blur="doneEdit(player)"
                  @keyup="editPlayer(player)"
                  @click="editPlayer(player)"
-                 @keyup.enter="doneEdit(player)"
+                 @keyup.enter="doneEdit(player, true)"
                  @keyup.esc="cancelEdit(player)">
         </li>
       </ul>
@@ -115,8 +115,8 @@ export default {
       }
     },
 
-    doneEdit: function (player) {
-      if (!this.editingName) {
+    doneEdit: function (player, enter) {
+      if (this.editingName !== player) {
         this.checkNew(player)
         return
       }
@@ -125,7 +125,7 @@ export default {
         this.deletePlayer(player)
       }
       // If on last Player then focus New Player
-      if (this.players2.indexOf(player) === this.players2.length - 1) {
+      if (enter === true && this.players2.indexOf(player) === this.players2.length - 1) {
         this.editingName = this.newPlayer
       } else {
         this.editingName = false
