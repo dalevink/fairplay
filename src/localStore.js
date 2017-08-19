@@ -1,19 +1,41 @@
 // localStorage persistence
 
-let STORAGE_KEY = 'teamV057'
-var uid = 100
-var t
+let STORAGE_KEY = 'teamV00002'
+let uid = 100
+let t
 
 export default {
-  fetch: function () {
+  newData (players) {
+    return {
+      gameState: 0,
+
+      totalGameTime: 0,
+      currentGameTime: 0,
+      totalPaused: 0,
+      currentPaused: 0,
+
+      timeStart: 0,
+
+      timeSync: 0,
+      logId: 0,
+      logList: [],
+
+      players2: players || []
+    }
+  },
+  resetGame () {
+    t = this.newData(t.players2.map(player => this.newPlayer(player.playerName, player.id)))
+    return t
+  },
+  fetch () {
     if (t === undefined) {
-      t = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { players2: [] }
+      t = JSON.parse(localStorage.getItem(STORAGE_KEY)) || this.newData()
     }
     return t
   },
-  newPlayer: function (name) {
+  newPlayer: function (name, id) {
     return {
-      id: uid++,
+      id: id !== undefined ? id : uid++,
       playerName: name,
       start: 0,
       secondsOn: 0,
@@ -24,7 +46,9 @@ export default {
       isOn: -1
     }
   },
-  save: function (data) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  save () {
+    if (t !== undefined) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(t))
+    }
   }
 }

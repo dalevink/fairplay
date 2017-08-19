@@ -39,14 +39,6 @@ h1 {
   text-align: center;
 }
 
-.app-name-center {
-  color: #999;
-  text-align: center;
-}
-.crumb {
-  float: left;
-}
-
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

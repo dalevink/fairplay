@@ -6,32 +6,10 @@
                 v-show="gameState == 0"
         >
             <button
-                    class="button-large button-large-off"
+                    class="button-large button-large-on"
                     @click="startGame()"
             >
-                Start Match
-            </button>
-        </div>
-
-        <div
-                class="top-buttons"
-                v-show="gameState == -2 && players2.length > 1"
-        >
-            <button
-                    class="button-large"
-                    @click="savePlayers()"
-            >
-                Done Editing…
-            </button>
-        </div>
-        <div
-                class="top-buttons"
-                v-show="gameState == -2 && players2.length <= 1"
-        >
-            <button
-                    class="button-large button-large-disabled"
-            >
-                Add Players
+                Start a New Match
             </button>
         </div>
 
@@ -40,7 +18,7 @@
                 v-show="gameState == 1"
         >
             <button
-                    class="button-large button-large-on"
+                    class="button-large button-large-min"
                     @click="pausePlay()"
             >
                 Stop Play
@@ -52,7 +30,7 @@
                 v-show="gameState == 2"
         >
             <button
-                    class="button-large button-large-off"
+                    class="button-large button-large-min"
                     @click="resumePlay()"
             >
                 Start Play
@@ -69,24 +47,28 @@
         </div>
 
         <section
-                :class="{ 'is-stopped': gameState != 1, 'is-paused': gameState == 2, 'is-end': gameState == 3 }"
+                v-if="gameState > 0"
         >
-            <div class="time-desc">
-                Game Time
-            </div>
-            <div class="time-large">
-                {{ currentGameTime | formatTime }}
-            </div>
-        </section>
-        <section
-            :class="{ 'hidden': currentPaused < 1 }"
-        >
-            <div class="time-paused"
-                :class="{ 'time-paused-paused': gameState == 2 && currentPaused % 2 }"
+            <section
+                    :class="{ 'is-stopped': gameState != 1, 'is-paused': gameState == 2, 'is-end': gameState == 3 }"
             >
-                {{ currentPaused | formatTime }}
-                Time Paused
-            </div>
+                <div class="time-desc">
+                    Game Time
+                </div>
+                <div class="time-large">
+                    {{ currentGameTime | formatTime }}
+                </div>
+            </section>
+            <section
+                :class="{ 'hidden': currentPaused < 1 }"
+            >
+                <div class="time-paused"
+                    :class="{ 'time-paused-paused': gameState == 2 && currentPaused % 2 }"
+                >
+                    {{ currentPaused | formatTime }}
+                    Play Stopped
+                </div>
+            </section>
         </section>
 
         <team
@@ -107,18 +89,6 @@
                     <span class="player-seconds">{{ player.secondsOn | formatTime }}</span>
                 </li>
             </transition-group>
-
-            <div
-                    class="top-buttons"
-                    v-show="gameState == 2"
-            >
-                <button
-                        class="button-large button-large-end"
-                        @click="endGame()"
-                >
-                    End Game
-                </button>
-            </div>
 
             <section v-show="logList.length">
                 <h4 class="sub-log-title">
@@ -143,6 +113,18 @@
 
         <div
                 class="top-buttons"
+                v-show="gameState == 2"
+        >
+            <button
+                    class="button-large button-large-off"
+                    @click="endGame()"
+            >
+                End Game
+            </button>
+        </div>
+
+        <div
+                class="top-buttons"
                 v-show="gameState == 0"
         >
             <button
@@ -153,26 +135,29 @@
             </button>
         </div>
         <div
-                class="top-buttons"
-                v-show="gameState == -2 && players2.length > 1"
+                class=""
+                v-show="gameState == -2 && players2.length > 0"
         >
             <button
-                    class="button-large"
+                    class="button-large button-large-on"
                     @click="savePlayers()"
             >
-                Done Editing…
+                Done Editing,
+                {{ players2.length }} Player{{ players2.length | pluralize }}…
             </button>
         </div>
 
         <div
+                class="top-buttons"
                 v-show="gameState == 3"
         >
-            <h3 class="crumb">
-                <router-link to="/">&larr; Done</router-link>
-            </h3>
-            <div class="clear"></div>
+            <button
+                    class="button-large button-large-min"
+                    @click="clearGame()"
+            >
+                Clear Game and Start Over
+            </button>
         </div>
-
 
     </div>
 </template>
@@ -205,25 +190,17 @@
     return min + ':' + padLeft(sec, '0', 2)
   }
 
+  let newGame = function () {
+    let d = localStore.fetch()
+    // console.log(d)
+    return d
+  }
+
   export default {
     data () {
-      let common = localStore.fetch()
-      return {
-        gameState: common.players2.length > 1 ? 0 : -2,
-
-        totalGameTime: 0,
-        currentGameTime: 0,
-        totalPaused: 0,
-        currentPaused: 0,
-
-        timeStart: 0,
-
-        timeSync: 0,
-        logId: 0,
-        logList: [],
-
-        players2: common.players2
-      }
+      let o = newGame()
+      o.gameState = o.players2.length > 1 ? 0 : -2
+      return o
     },
     components: {
       Team
@@ -279,6 +256,10 @@
       },
       editPlayers () {
         this.gameState = -2
+        // console.log(this.gameState)
+      },
+      clearGame () {
+        Object.assign(this.$data, localStore.resetGame())
       },
       calcTime (state) {
         this.gameState = state
@@ -354,20 +335,6 @@
     },
     created () {
       this.players2.sort(naturalSort)
-      /*
-        this.players2.push({
-          id: id,
-          playerName: name,
-          start: timeRounded(this.timeSync),
-          secondsOn: 0,
-          totalOn: 0,
-          totalOff: 0,
-          sessionOn: 0,
-          sessionOff: 0,
-          isOn: -1
-        })
-      })
-      */
       this.updateData()
     },
     mounted () {
@@ -418,7 +385,7 @@
         color: white;
     }
     .player-on.player-time-stopped {
-        background: @colorOff1;
+        background: mix(whitesmoke, @colorOff1, 30%);
     }
 
     .time-large {

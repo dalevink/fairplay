@@ -1,6 +1,19 @@
 <template>
   <div class="team">
 
+      <div
+              class="top-buttons"
+      >
+          <div class="button-large button-large-disabled">
+              <span v-if="isStart">
+                Add Players to Start
+              </span>
+              <span v-if="!isStart">
+                Add or Change Players
+              </span>
+          </div>
+      </div>
+
       <ul class="players-ul">
         <li v-for="player in playersWithNew"
             class="players-li"
@@ -27,9 +40,6 @@
                  @keyup.esc="cancelEdit(player)">
         </li>
       </ul>
-      <footer class="footer">
-          <strong>{{ players2.length }}</strong> {{ players2.length | pluralize }}
-      </footer>
   </div>
 </template>
 
@@ -54,6 +64,7 @@ export default {
       players2: common.players2,
       newPlayer: newPlayer,
       editingName: false,
+      isStart: common.players2.length === 0,
       uid: 0
     }
   },
@@ -65,8 +76,7 @@ export default {
   watch: {
     players2: {
       handler: function () {
-        // todo move
-        localStore.save(this.$data)
+        localStore.save()
       },
       deep: true
     }
@@ -82,9 +92,6 @@ export default {
   },
 
   filters: {
-    pluralize: function (n) {
-      return n === 1 ? 'Player' : 'Players'
-    }
   },
 
   methods: {
@@ -180,11 +187,6 @@ export default {
 }
 section {
     margin: 0;
-}
-.footer {
-    text-align: right;
-    font-size: 90%;
-    color: @colorOff1;
 }
 .player-edit {
   display: none;
