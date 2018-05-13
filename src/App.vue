@@ -5,6 +5,9 @@
 </template>
 
 <script>
+import store from './store'
+import common from './common'
+
 window.addEventListener('touchstart', function onFirstTouch () {
   let d = document.documentElement
   d.className = d.className.replace(/\bno-touch\b/, '')
@@ -13,6 +16,10 @@ window.addEventListener('touchstart', function onFirstTouch () {
   // we only need to know once that a human touched the screen, so we can stop listening now
   window.removeEventListener('touchstart', onFirstTouch, false)
 }, false)
+
+store.data = common.fetch(store.data)
+
+setInterval(() => common.save(store.data), 1000)
 
 export default {
   name: 'app'

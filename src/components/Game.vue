@@ -1,9 +1,8 @@
 <template>
     <div class="game">
-
         <div
                 class="top-buttons"
-                v-show="gameState == store.START"
+                v-show="sharedStore.gameState == common.START"
         >
             <button
                     class="button-large button-large-on"
@@ -15,7 +14,7 @@
 
         <div
                 class="top-buttons"
-                v-show="gameState == store.PLAYING"
+                v-show="sharedStore.gameState == common.PLAYING"
         >
             <button
                     class="button-large button-large-min"
@@ -27,7 +26,7 @@
 
         <div
                 class="top-buttons"
-                v-show="gameState == store.PAUSED"
+                v-show="sharedStore.gameState == common.PAUSED"
         >
             <button
                     class="button-large button-large-min"
@@ -39,16 +38,16 @@
 
         <h1
                 class="top-buttons heading"
-                v-show="gameState == store.END"
+                v-show="sharedStore.gameState == common.END"
         >
             End of Play
         </h1>
 
         <section
-                v-if="gameState > store.START"
+                v-if="sharedStore.gameState > common.START"
         >
             <section
-                    :class="{ 'is-stopped': gameState != store.PLAYING, 'is-paused': gameState == store.PAUSED, 'is-end': gameState == store.END }"
+                    :class="{ 'is-stopped': sharedStore.gameState != common.PLAYING, 'is-paused': sharedStore.gameState == common.PAUSED, 'is-end': sharedStore.gameState == common.END }"
             >
                 <div class="time-desc">
                     Game Time
@@ -61,7 +60,7 @@
                 :class="{ 'hidden': currentPaused < 1 }"
             >
                 <div class="time-paused"
-                    :class="{ 'time-paused-paused': gameState == store.PAUSED, 'time-paused-paused-flash': gameState == store.PAUSED && currentPaused % 2 }"
+                    :class="{ 'time-paused-paused': sharedStore.gameState == common.PAUSED, 'time-paused-paused-flash': sharedStore.gameState == common.PAUSED && currentPaused % 2 }"
                 >
                     Play Stopped for {{ currentPaused | formatTime }}
                 </div>
@@ -69,21 +68,21 @@
         </section>
 
         <team
-                v-if="gameState === store.EDIT"
+                v-if="sharedStore.gameState === common.EDIT"
         ></team>
 
         <section
-                v-if="gameState >= store.START"
+                v-if="sharedStore.gameState >= common.START"
         >
             <transition-group name="anim-list" tag="ul" class="players">
                 <li class="player"
                     v-for="player in playersFiltered"
                     :key="player.id"
-                    :class="{ 'player-on': player.isOn === 1, 'player-time-stopped': gameState != store.PLAYING }"
+                    :class="{ 'player-on': player.isOn === 1, 'player-time-stopped': sharedStore.gameState != common.PLAYING }"
                     @click="clickPlayer(player)"
                 >
-                    <strong class="player-name">{{ player.playerName }}</strong>
-                    <span class="player-seconds">{{ player.secondsOn | formatTime }}</span>
+                    <strong class="left-col player-name">{{ player.playerName }}</strong>
+                    <span class="right-col player-seconds">{{ player.secondsOn | formatTime }}</span>
                 </li>
             </transition-group>
 
@@ -91,7 +90,7 @@
 
         <div
                 class="top-buttons"
-                v-show="gameState == store.PAUSED"
+                v-show="sharedStore.gameState == common.PAUSED"
         >
             <button
                     class="button-large button-large-off"
@@ -103,7 +102,7 @@
 
         <div
                 class="top-buttons"
-                v-show="gameState == store.START"
+                v-show="sharedStore.gameState == common.START"
         >
             <button
                     class="button-large button-large-min"
@@ -114,20 +113,20 @@
         </div>
         <div
                 class=""
-                v-show="gameState == store.EDIT && players2.length > 0"
+                v-show="sharedStore.gameState == common.EDIT && sharedStore.players3.length > 0"
         >
             <button
                     class="button-large button-large-on"
                     @click="savePlayers()"
             >
                 Done Editing,
-                {{ players2.length }} Player{{ players2.length | pluralize }}…
+                {{ sharedStore.players3.length }} Player{{ sharedStore.players3.length | pluralize }}…
             </button>
         </div>
 
         <div
                 class="top-buttons"
-                v-show="gameState == store.END"
+                v-show="sharedStore.gameState == common.END"
         >
             <button
                     class="button-large button-large-min"
@@ -138,23 +137,23 @@
         </div>
 
         <section
-                v-if="gameState >= store.START && logList.length"
+                v-if="sharedStore.gameState >= common.START && sharedStore.logList.length"
         >
             <h4 class="sub-log-title">
-                Substitution{{ logList.length | pluralize }}
+                Substitution{{ sharedStore.logList.length | pluralize }}
                 <span class="sub-log-title-right">Time On</span>
             </h4>
             <ul class="sub-log">
                 <li class="sub-log-li"
-                    v-for="log in logList"
-                    :key="logList['id']"
+                    v-for="log in sharedStore.logList"
+                    :key="sharedStore.logList['id']"
                 >
-                    <strong class="player-name">
+                    <strong class="left-col player-name">
                         {{ log['logTime'] | formatTime }} {{ log['logPlayer'].playerName }} {{ log | logFormatDesc }}
-                        <span class="sub-log-right">
-                            {{ log['logTotalOn'] | logFormatTime }}
-                        </span>
                     </strong>
+                    <span class="right-col">
+                        {{ log['logTotalOn'] | logFormatTime }}
+                    </span>
                 </li>
             </ul>
         </section>
@@ -166,6 +165,7 @@
   import naturalSort from 'javascript-natural-sort'
   import Team from './Team.vue'
   import store from '../store'
+  import common from '../common'
 
   let padLeft = function (string, pad, length) {
     return (new Array(length + 1).join(pad) + string).slice(-length)
@@ -182,34 +182,30 @@
     return min + ':' + padLeft(sec, '0', 2)
   }
 
-  let newGame = function () {
-    let d = store.fetch()
-    // console.log(d)
-    return d
-  }
-
   export default {
+
     data () {
-      let o = newGame()
-      o.gameState = o.players2.length > 1 ? store.START : store.EDIT
-      o.store = store
+      let o = {
+        currentGameTime: 0,
+        currentPaused: 0,
+        timeSync: 0
+      }
+      o.common = common
+      o.sharedStore = store.data
       return o
     },
     components: {
       Team
     },
     beforeCreate () {
-      if (this.timeSync === 0) {
-        this.timeSync = new Date().getTime()
-      }
     },
 
     computed: {
       playersFiltered () {
-        let off = this.players2.filter(function (p) {
+        let off = this.sharedStore.players3.filter(function (p) {
           return p.isOn !== 1
         }).sort(this.timeSort)
-        let on = this.players2.filter(function (p) {
+        let on = this.sharedStore.players3.filter(function (p) {
           return p.isOn === 1
         }).sort(this.timeSort)
         return off.concat(on)
@@ -232,42 +228,51 @@
     methods: {
       // Start / End Game + Pause / Resume Play
       startGame () {
-        this.timeStart = timeRounded(this.timeSync)
-        this.calcTime(store.PLAYING)
+        this.sharedStore.timeStart = timeRounded(this.sharedStore.timeSync)
+        this.calcTime(common.PLAYING)
       },
       pausePlay () {
-        this.calcTime(store.PAUSED)
+        this.calcTime(common.PAUSED)
       },
       resumePlay () {
-        this.calcTime(store.PLAYING)
+        this.calcTime(common.PLAYING)
       },
       endGame () {
-        this.calcTime(store.END)
+        this.calcTime(common.END)
       },
       savePlayers () {
-        this.gameState = store.START
+        this.sharedStore.gameState = common.START
       },
       editPlayers () {
-        this.gameState = store.EDIT
-        // console.log(this.gameState)
+        this.sharedStore.gameState = common.EDIT
+        // console.log(this.sharedStore.gameState)
       },
       clearGame () {
-        Object.assign(this.$data, store.resetGame())
+        this.sharedStore.gameState = common.START
+        this.sharedStore.players3 = this.sharedStore.players3.map(player => common.newPlayer(player.playerName, player.id))
+        this.sharedStore.logId = 0
+        this.sharedStore.logList = []
+        this.sharedStore.timeStart = 0
+        this.sharedStore.totalGameTime = 0
+        this.sharedStore.totalPaused = 0
+
+        this.currentGameTime = 0
+        this.currentPaused = 0
       },
       calcTime (state) {
-        this.gameState = state
-        let now = timeRounded(this.timeSync)
-        let dif = this.secDif(this.timeStart, now)
-        this.timeStart = timeRounded(this.timeSync)
-        if (this.gameState === store.PLAYING || this.gameState === store.END) {
-          this.totalPaused += dif
-          let now = timeRounded(this.timeSync)
-          this.players2.forEach((v, i) => {
+        this.sharedStore.gameState = state
+        let now = timeRounded(this.sharedStore.timeSync)
+        let dif = this.secDif(this.sharedStore.timeStart, now)
+        this.sharedStore.timeStart = timeRounded(this.sharedStore.timeSync)
+        if (this.sharedStore.gameState === common.PLAYING || this.sharedStore.gameState === common.END) {
+          this.sharedStore.totalPaused += dif
+          let now = timeRounded(this.sharedStore.timeSync)
+          this.sharedStore.players3.forEach((v, i) => {
             v.start = now
           })
         } else {
-          this.totalGameTime += dif
-          this.players2.forEach((v, i) => {
+          this.sharedStore.totalGameTime += dif
+          this.sharedStore.players3.forEach((v, i) => {
             if (v.isOn === 1) {
               v.totalOn += this.secDif(v.start, now)
             } else {
@@ -280,31 +285,31 @@
         return a.secondsOn < b.secondsOn ? 1 : -1
       },
       updateData () {
-        let now = timeRounded(this.timeSync)
-        this.players2.forEach((v, i) => {
+        let now = timeRounded(this.sharedStore.timeSync)
+        this.sharedStore.players3.forEach((v, i) => {
           v.secondsOn = v.totalOn
-          if (v.isOn === 1 && this.gameState === store.PLAYING) {
+          if (v.isOn === 1 && this.sharedStore.gameState === common.PLAYING) {
             v.secondsOn += this.secDif(v.start, now)
           }
         })
-        this.currentGameTime = this.totalGameTime +
-          (this.gameState === store.PLAYING ? this.secDif(this.timeStart, now) : 0)
-        this.currentPaused = this.totalPaused +
-          (this.gameState === store.PAUSED ? this.secDif(this.timeStart, now) : 0)
+        this.currentGameTime = this.sharedStore.totalGameTime +
+          (this.sharedStore.gameState === common.PLAYING ? this.secDif(this.sharedStore.timeStart, now) : 0)
+        this.currentPaused = this.sharedStore.totalPaused +
+          (this.sharedStore.gameState === common.PAUSED ? this.secDif(this.sharedStore.timeStart, now) : 0)
       },
       secDif (start, end) {
         return Math.floor((end - start) / 1000)
       },
       clickPlayer (player) {
-        if (this.gameState === store.END) {
+        if (this.sharedStore.gameState === common.END) {
           return
         }
 
-        let now = timeRounded(this.timeSync)
+        let now = timeRounded(this.sharedStore.timeSync)
 
         // Only apply time when game on
         let dif = 0
-        if (this.gameState === store.PLAYING) {
+        if (this.sharedStore.gameState === common.PLAYING) {
           dif = this.secDif(player.start, now)
         }
         player.start = now
@@ -317,8 +322,8 @@
           player.totalOff += dif
         }
 
-        this.logList.unshift({
-          'id': this.logId++,
+        this.sharedStore.logList.unshift({
+          'id': this.sharedStore.logId++,
           'logPlayer': player,
           'logTime': this.currentGameTime,
           'logDesc': player.isOn === 1 ? 'On' : 'Off',
@@ -327,7 +332,7 @@
       }
     },
     created () {
-      this.players2.sort(naturalSort)
+      this.sharedStore.players3.sort(naturalSort)
       this.updateData()
     },
     mounted () {
@@ -356,19 +361,33 @@
         border-radius: 2px;
         cursor: pointer;
         background: whitesmoke;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .right-col,
+    .left-col {
+        display: inline-block;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        float: left;
+        width: 75%;
+    }
+    .right-col {
+        float: right;
+        text-align: right;
+        width: 25%;
     }
 
     .player-name {
         font-weight: 500;
-        text-align: left;
-        min-width: 200px;
     }
 
     .player-seconds {
-        min-width: 200px;
         font-weight: 200;
-        text-align: right;
-        float: right;
     }
 
     .player-on {
@@ -458,8 +477,7 @@
         margin-top: -1px;
         font-size: 87%;
         color: @colorOff2;
-    }
-    .sub-log-right {
-        float: right;
+        width: 100%;
+        overflow: hidden;
     }
 </style>

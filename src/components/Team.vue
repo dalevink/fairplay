@@ -1,6 +1,5 @@
 <template>
   <div class="team">
-
       <div
               class="top-buttons"
       >
@@ -44,28 +43,20 @@
 </template>
 
 <script>
-// import naturalSort from 'javascript-natural-sort'
 import store from '../store'
+import common from '../common'
+
 export default {
   // app initial state
   props: {
-    players3: {
-      default: function () {
-        return []
-      },
-      type: Array
-    }
   },
 
   data () {
-    let common = store.fetch()
-    let newPlayer = store.newPlayer('')
+    let newPlayerEnt = this.newPlayer('')
     return {
-      players2: common.players2,
-      newPlayer: newPlayer,
+      newPlayerEnt: newPlayerEnt,
       editingName: false,
-      isStart: common.players2.length === 0,
-      uid: 0
+      sharedStore: store.data
     }
   },
 
@@ -74,20 +65,14 @@ export default {
 
   // watch players change for localStorage persistence
   watch: {
-    players2: {
-      handler: function () {
-        store.save()
-      },
-      deep: true
-    }
   },
 
   // computed properties
   // http://vuejs.org/guide/computed.html
   computed: {
     playersWithNew () {
-      // if (this.players2.every((player) => player.playerName !== '')) {
-      return this.players2.concat(this.newPlayer)
+      // if (this.sharedStore.players3.every((player) => player.playerName !== '')) {
+      return this.sharedStore.players3.concat(this.newPlayerEnt)
     }
   },
 
@@ -95,9 +80,18 @@ export default {
   },
 
   methods: {
+
+    newPlayer: function (name, id) {
+      return common.newPlayer(name, id)
+    },
+
     newPlaceholder (p) {
       // We only want a placeholder on the last input
-      return this.players2.indexOf(p) === -1 ? 'Enter a New Players Name' : ''
+      return this.sharedStore.players3.indexOf(p) === -1 ? 'Enter a New Players Name' : ''
+    },
+
+    isStart: function () {
+      return this.sharedStore.players3.length === 0
     },
 
     editPlayer: function (player) {
@@ -109,9 +103,9 @@ export default {
     },
 
     checkNew (player) {
-      if (player.playerName && this.players2.indexOf(player) === -1) {
-        this.players2.push(player)
-        this.newPlayer = store.newPlayer('')
+      if (player.playerName && this.sharedStore.players3.indexOf(player) === -1) {
+        this.sharedStore.players3.push(player)
+        this.newPlayerEnt = this.newPlayer('')
       }
     },
 
@@ -121,19 +115,19 @@ export default {
         return
       }
       player.playerName = player.playerName.trim()
-      if (player.playerName === '' && this.players2.indexOf(player) !== -1) {
+      if (player.playerName === '' && this.sharedStore.players3.indexOf(player) !== -1) {
         this.deletePlayer(player)
       }
       // If on last Player then focus New Player
-      if (enter === true && this.players2.indexOf(player) === this.players2.length - 1) {
-        this.editingName = this.newPlayer
+      if (enter === true && this.sharedStore.players3.indexOf(player) === this.sharedStore.players3.length - 1) {
+        this.editingName = this.newPlayerEnt
       } else {
         this.editingName = false
       }
     },
 
     deletePlayer (player) {
-      this.players2.splice(this.players2.indexOf(player), 1)
+      this.sharedStore.players3.splice(this.sharedStore.players3.indexOf(player), 1)
     },
 
     cancelEdit: function (player) {
