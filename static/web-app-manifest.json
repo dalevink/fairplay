@@ -1,0 +1,16 @@
+{
+  "name": "Fairplay",
+  "short_name": "Fairplay",
+  "display": "standalone",
+  "background_color": "#2176c7",
+  "theme_color": "#2176c7",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "https://dalevink.github.io/fairplay/static/clock.svg",
+      "sizes": "any",
+      "type": "image/svg"
+    }
+  ]
+}
