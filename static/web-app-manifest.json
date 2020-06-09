@@ -8,9 +8,14 @@
   "start_url": "/",
   "icons": [
     {
-      "src": "https://dalevink.github.io/fairplay/static/clock.svg",
+      "src": "https://dalevink.github.io/fairplay/static/time.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "https://dalevink.github.io/fairplay/static/time.png",
       "sizes": "any",
-      "type": "image/svg"
+      "type": "image/png"
     }
   ]
 }
