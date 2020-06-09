@@ -5,7 +5,7 @@
       >
           <h1 class="heading">
               <span v-if="isStart">
-                Add Players to Start.
+                Add Players to Start
               </span>
               <span v-if="!isStart">
                 Add or Change Players
