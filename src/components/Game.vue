@@ -93,10 +93,10 @@
                 v-show="sharedStore.gameState == common.PAUSED"
         >
             <button
-                    class="button-large button-large-off"
+                    class="button-large button-large-min"
                     @click="endGame()"
             >
-                End Game
+                {{ sharedStore.endWarning ? "Are you sure?" : "End Game" }}
             </button>
         </div>
 
@@ -232,13 +232,24 @@
         this.calcTime(common.PLAYING)
       },
       pausePlay () {
+        this.sharedStore.endGameWarning = false
         this.calcTime(common.PAUSED)
       },
       resumePlay () {
         this.calcTime(common.PLAYING)
       },
       endGame () {
-        this.calcTime(common.END)
+        if (this.sharedStore.endWarning) {
+          this.sharedStore.endWarning = false
+          this.calcTime(common.END)
+        } else {
+          this.sharedStore.endWarning = true
+          window.setInterval(() => {
+            if (this.sharedStore.endWarning) {
+              this.sharedStore.endWarning = false
+            }
+          }, 3000)
+        }
       },
       savePlayers () {
         this.sharedStore.gameState = common.START
@@ -351,6 +362,7 @@
         margin-bottom: 20px;
     }
     .players {
+        margin-bottom: 100px;
         list-style-type: none;
         padding: 0;
     }

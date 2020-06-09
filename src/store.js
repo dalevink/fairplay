@@ -5,7 +5,7 @@ export default {
   data: {
     uid: 1000,
     gameState: common.EDIT,
-
+    endGameWarning: false,
     timeStart: 0,
     timeSync: new Date().getTime(),
     totalGameTime: 0,
