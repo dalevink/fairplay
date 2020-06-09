@@ -4,13 +4,18 @@
   "display": "standalone",
   "background_color": "#2176c7",
   "theme_color": "#2176c7",
-  "scope": "/",
-  "start_url": "/",
+  "scope": "/fairplay",
+  "start_url": "/fairplay",
   "icons": [
     {
-      "src": "https://dalevink.github.io/fairplay/static/clock.svg",
+      "src": "https://dalevink.github.io/fairplay/static/time.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "https://dalevink.github.io/fairplay/static/time.png",
       "sizes": "any",
-      "type": "image/svg"
+      "type": "image/png"
     }
   ]
 }
